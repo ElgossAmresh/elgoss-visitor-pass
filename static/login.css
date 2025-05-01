@@ -1,0 +1,140 @@
+/* Container with Background Blur Effect */
+.login_html_container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: url("./images/c.jpg") no-repeat center center;
+    background-size: cover;
+    padding: 20px; /* Prevent content from touching edges on mobile */
+    position: relative; /* Needed for ::before and ::after */
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* Pseudo-element for blurred background */
+.login_html_container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, #1d2b64, #f8cdda);
+    background-size: cover;
+    filter: blur(18px);
+    z-index: -2;
+}
+
+/* Slight overlay to soften */
+.login_html_container::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: -1;
+}
+
+/* 3D ELGOSS Branding */
+.branding {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 12px;
+    font-weight: 2;
+    letter-spacing: 3px;
+    color: #ffffff;
+    text-transform: uppercase;
+    z-index: 10;
+    text-shadow:
+        1px 1px 0 #ccc,
+        2px 2px 0 #bbb,
+        3px 3px 2px rgba(0, 0, 0, 0.3);
+    transform: perspective(800px) rotateX(4deg) rotateY(-6deg);
+}
+
+/* Login Box with Glass Effect */
+.login_html_block {
+    padding: 40px 30px;
+    width: 100%;
+    max-width: 420px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.4),
+        inset 0 0 25px rgba(255, 255, 255, 0.06);
+    transition: all 0.4s ease;
+    box-sizing: border-box;
+}
+
+/* Login Box Hover */
+.login_html_block:hover {
+    transform: scale(1.01);
+    backdrop-filter: blur(25px);
+}
+
+/* Form Inputs */
+.login_html_row input,
+.login_html_row input:focus {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 10px;
+    border-radius: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Labels */
+.login_html_row label {
+    color: #ffffffd9;
+}
+
+/* Heading */
+p.login_html_heading {
+    font-size: 34px;
+    font-weight: 800;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: #ffffff;
+    text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.4);
+    margin-bottom: 20px;
+}
+
+/* Responsive Tweaks */
+@media (max-width: 768px) {
+    .login_html_block {
+        padding: 30px 20px;
+        max-width: 90%;
+    }
+
+    p.login_html_heading {
+        font-size: 26px;
+        letter-spacing: 2px;
+    }
+
+    .branding {
+        font-size: 10px;
+        left: 5px;
+        top: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login_html_block {
+        padding: 25px 15px;
+    }
+
+    p.login_html_heading {
+        font-size: 22px;
+    }
+
+    .login_html_row input {
+        padding: 8px;
+    }
+}

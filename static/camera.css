@@ -1,0 +1,47 @@
+.camera-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: calc(100vh - 80px); /* Adjust based on navbar height */
+}
+
+.camera-box {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 700px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.camera-box video,
+.camera-box img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.camera-box .btn {
+  margin-top: 15px;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .camera-wrapper {
+    padding: 10px;
+  }
+
+  .camera-box {
+    padding: 20px;
+  }
+
+  .camera-box .btn {
+    width: 100%;
+    margin-top: 10px;
+  }
+}

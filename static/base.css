@@ -1,0 +1,147 @@
+/* Global */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
+}
+
+/* Sidebar */
+.sidebar {
+  height: 100vh;
+  background-color: #212121;
+  padding-top: 60px; /* Match navbar height */
+  position: fixed;
+  width: 250px;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+}
+
+.sidebar a {
+  color: #cbd5e1;
+  padding: 12px 20px;
+  display: block;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.sidebar a:hover
+ {
+  background-color: #6d97b9;
+  color: #fff;
+  border-left: 4px solid #fff;
+}
+.sidebar a.active {
+  background-color: #6d97b9;
+  color: #fff;
+  border-left: 4px solid #fff;
+}
+
+/* Navbar */
+.navbar {
+  height: 60px;
+  background-color: #fff;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: fixed;
+  top: 0;
+  left: 250px;
+  right: 0;
+  z-index: 1100;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: left 0.3s ease;
+}
+
+/* Navbar content */
+.navbar-title {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.navbar-user {
+  font-size: 16px;
+}
+
+/* Main Content */
+main {
+  margin-left: 250px;
+  padding-top: 80px; /* Space for navbar */
+  padding: 20px;
+  transition: margin-left 0.3s ease;
+}
+
+/* Toggle Sidebar Button */
+.toggle-sidebar {
+  display: none;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background: #212121;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  font-size: 20px;
+  z-index: 1200;
+  cursor: pointer;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .navbar {
+    left: 0;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    height: auto;
+    padding: 10px 15px;
+    gap: 5px;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    width: 250px;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+  }
+
+  .sidebar.active {
+    transform: translateX(0);
+  }
+
+  .toggle-sidebar {
+    display: block;
+  }
+
+  main {
+    margin-left: 0;
+    padding-top: 100px;
+  }
+}
+
+/* Cards */
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.card1, .card2, .card3, .card4 {
+  flex: 1 1 200px;
+  padding: 20px;
+  border-radius: 10px;
+  color: white;
+}
+
+.card1 { background-color: #87bdf4; }
+.card2 { background-color: #a99dde; }
+.card3 { background-color: #97dbce; }
+.card4 { background-color: #98d8ac; }
+
+.text-info.h4 {
+  --bs-text-opacity: 1;
+  color: rgb(15 15 16) !important;
+}

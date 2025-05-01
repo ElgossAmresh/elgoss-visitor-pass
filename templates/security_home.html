@@ -1,0 +1,21 @@
+{% extends 'security_base.html' %}
+
+{% block title %}home{% endblock title %}
+<link href="../static/base.css" rel="stylesheet">
+{% block body %}
+
+
+    <!-- Home -->
+    <div>
+      
+      <h3>Dashboard Summary</h3>
+      <div class="row g-3 mt-2">
+       <div class="col-md-3"><div class="card1 text-center p-3"><h4 class="text-primary"> {{countvis}}</h4><p>Today's Entries</p></div></div>
+        <div class="col-md-3"><div class="card2 text-center p-3"><h4 class="text-danger">0</h4><p>Today's Exits</p></div></div>
+        <div class="col-md-3"><div class="card3 text-center p-3"><h4 class="text-warning">0</h4><p>Checkpoints</p></div></div>
+        <div class="col-md-3"><div class="card4 text-center p-3"><h4 class="text-dark">{{ total }}</h4><p>Total Visitors</p></div></div>
+      </div>
+    </div>
+  
+
+    {% endblock body %}
