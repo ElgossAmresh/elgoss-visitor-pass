@@ -1,8 +1,9 @@
 from flask import Blueprint, request, redirect, url_for,render_template,flash
-from models.database import collection, securitylog,visitorlogtable,activevisitorstable,rejectedvistable
+from models.database import collection, securitylog,visitorlogtable,activevisitorstable,rejectedvistable,visitors_status
 from werkzeug.security import generate_password_hash
 from flask_login import login_required
-
+from datetime import datetime
+from pymongo import ASCENDING 
 security = Blueprint('security', __name__, template_folder='templates')
 visitobj = list(visitorlogtable.find())
 activeobj = list(activevisitorstable.find())
@@ -49,19 +50,65 @@ def add_security():
         return redirect(url_for('routes.login'))  # Redirect to the login page
 
 
-@security.route('/securitydash')
+@security.route('/securitydash',methods=['GET','POST'])
 def securitydash():
     pan_data={}
+ 
+
+    from_date = request.form.get('FromDate')
+    to_date = request.form.get('ToDate')
+
+    query = {}
+
+    if from_date and to_date:
+        try:
+            from_obj = datetime.strptime(from_date, '%Y-%m-%d')
+            to_obj = datetime.strptime(to_date, '%Y-%m-%d')
+            query['Date'] = {"$gte": from_date, "$lte": to_date}
+
+        except ValueError:
+            pass  
+
+    visitors = visitors_status.find(query).sort("Date", ASCENDING)
     
     visitobj = list(visitorlogtable.find())
     activeobj = list(activevisitorstable.find())
-    return render_template('visitor.html', data=pan_data, visitobj=visitobj, activeobj=activeobj, approvedby=approvedby)
+    return render_template('visitor.html', data=pan_data, visitobj=visitobj, activeobj=activeobj, approvedby=approvedby,visit=visitors)
 
 
 @security.route("/visitor", methods=["GET"])
-def visitor():
-    visitobj = list(visitorlogtable.find())
+def visitor():   
+    
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+    print(f"startdate+++{start_date_str},end date---------{end_date_str}")
+    query = {}
+    visitobj = []
+
+    if start_date_str and end_date_str:
+        try:
+            # Parse dates from string to datetime
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+            end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+            end_date = end_date.replace(hour=23, minute=59, second=59)  # include full end day            
+            query = {
+                'Date': {
+                    '$gte': start_date,
+                    '$lte': end_date
+                }
+            }
+            print(f"quer++===================={query}")
+            visitobj = list(visitors_status.find(query))
+            print(f"store data in db {visitobj}")
+        except ValueError:            
+            visitobj = []
+
+    else:        
+        visitobj = list(visitors_status.find())
     return render_template("visitor.html",visitobj=visitobj)
+    
+
+
 @security.route("/security_home", methods=["GET"])
 def security_home():
    

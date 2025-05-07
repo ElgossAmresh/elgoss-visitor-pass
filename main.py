@@ -1,6 +1,7 @@
 from app.ocr import ocr
-# from app.image_processing import  preprocess_image
-from flask_bcrypt import Bcrypt
+
+
+
 from flask import Flask,render_template
 from config.setting import MONGO_URI,SECRET_KEY
 from app.routes import routes

@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, url_for, request, render_template
 from models.database import reqvistable, visitorlogtable, activevisitorstable, rejectedvistable,otp_send, visitors_status
 from app.camera_manager import release_camera
 import datetime,os
-from flask_login import login_required
+
 visitor = Blueprint('visitors', __name__)
 
 
@@ -67,7 +67,7 @@ def acceptvis(uid):
   
     visitorlogtable.insert_one(element1)
     activevisitorstable.insert_one(element1)
-    status = 'accept' 
+    status = 'accepted' 
     myquery = visitors_status.find_one({"UID": uid})
 
     visitors_status.update_one(myquery, {"$set": {"status": status}})
@@ -76,15 +76,14 @@ def acceptvis(uid):
     return redirect(url_for('admin.admindash'))
 
 
-@visitor.route('/rejectvis/<uid>', methods=['POST', 'GET'])
+@visitor.route('/rejectvis/<uid>', methods=['POST','GET'])
 def rejectvis(uid):
     element2 = reqvistable.find_one({"UID": uid})
     reqvistable.delete_one({"UID": uid})
     rejectedvistable.insert_one(element2)
-    status = 'reject'  
-    myquery = visitors_status.find_one({"UID": uid})
-
-    visitors_status.update_one(myquery, {"$set": {"status": status}})
+    
+    visitors_status.update_one({"UID": uid}, {"$set": {"status": "rejected"}})
+    
     return redirect(url_for('admin.admindash'))
 
 

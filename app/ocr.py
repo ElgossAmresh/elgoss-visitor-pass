@@ -50,8 +50,6 @@ def extract_card_details(filename):
         # print("extracted data  pan   ++++++ : ",data)#chnages
     elif "male" in text.lower() or "VID" in text:
         data = adhaar_read_data(text)
-    # print("extracted data  adhar  ------- : ",data)#chnages
-    # Removed try-except block since unicode is not needed in modern Python
     with io.open('info.json', 'w', encoding='utf-8') as outfile:
         data = json.dumps(data, indent=4, sort_keys=True, separators=(',', ': '), ensure_ascii=False)
         outfile.write(data)  # Direct string writing, no conversion needed

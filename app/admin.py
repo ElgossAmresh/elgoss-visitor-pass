@@ -36,7 +36,7 @@ def admindash():
     for visitor in all_visitors:
         if 'Date' in visitor:
             dt = visitor['Date']
-            # Convert string to datetime if needed
+           
             if isinstance(dt, str):
                 try:
                       dt = datetime.fromisoformat(dt)
@@ -48,7 +48,7 @@ def admindash():
             if visitor.get("status") == "accept":
                 monthly_stats[month]["accept"] += 1
 
-    #  month order for the chart
+    
     months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     accept_data = [monthly_stats[m]["accept"] for m in months]
@@ -71,12 +71,14 @@ def add_admin():
             Phone=request.form['phone']
             Job=request.form['jobtitle']
             Password=request.form['password']
+            today = datetime.now()
             hashed_password = generate_password_hash(Password)
             # hashed_password = bcrypt.generate_password_hash(Password).decode('utf-8')
             new_admin = {
                 "Name":Name,
                 "Email":Email,
                 "Phone":Phone,
+                "Date":today,
                 "Job":Job,
                 "Password":hashed_password 
 
@@ -92,43 +94,62 @@ def deleteuser(Phone):
     return redirect(url_for('admin.admindash'))
 
 
-@admin.route('/updateusers/<id>', methods=['POST', 'GET'])
-def updateusers(id):
-    users = collection.db.users
-    items = users.find_one({'_id': ObjectId(id)})
+# @admin.route('/updateusers/<id>', methods=['POST', 'GET'])
+# def updateusers(id):
+#     users = collection.db.users
+#     items = users.find_one({'_id': ObjectId(id)})
 
-    if request.method == 'POST':
-        if request.form['submit'] == 'pass':
-            myquery = {'_id': ObjectId(id)}
+#     if request.method == 'POST':
+#         if request.form['submit'] == 'pass':
+#             myquery = {'_id': ObjectId(id)}
 
-            updatelog = {"$set":
-                             {"Name": request.form.get('Name'),
-                              "Email": request.form.get('Email'),
-                              "Phone": request.form.get('Phone'),
-                              "Job": request.form.get('Job'),
-                              "Password": request.files.get('Password'),
-                              "date": datetime.datetime.utcnow()
-                              }
-                         }
+#             updatelog = {"$set":
+#                              {"Name": request.form.get('Name'),
+#                               "Email": request.form.get('Email'),
+#                               "Phone": request.form.get('Phone'),
+#                               "Job": request.form.get('Job'),
+#                               "Password": request.files.get('Password'),
+#                               "date": datetime.datetime.utcnow()
+#                               }
+#                          }
 
-    adminlog.update_one(myquery, updatelog)
-    collection.update_one(myquery, updatelog)
-    securitylog.update_one(myquery, updatelog)
+#     adminlog.update_one(myquery, updatelog)
+#     collection.update_one(myquery, updatelog)
+#     securitylog.update_one(myquery, updatelog)
 
-    return redirect(url_for('admin.admindash'))
+    # return redirect(url_for('admin.admindash'))
+
+@admin.route('/edituser/<string:Phone>', methods=['GET','POST'])
+def edituser():
+    phone = request.args.get('Phone')
+    user = collection.find_one({"Phone": phone})
+
+    return render_template('user_overview.html')
+
 @admin.route("/notification",methods=['POst','GET'])
 def notification():
     reqobj = list(reqvistable.find())
-    return render_template ('Notification.html',reqobj=reqobj)   
+    return render_template ('Notification.html',reqobj=reqobj) 
 
-@admin.route("/user_over",methods=['POst','GET'])
-def user_over():
-    
-    return render_template ('user_overview.html', secobj=secobj, adminobj=adminobj)  
+
+@admin.route("/filter_role", methods=['GET'])  # dropdown filtering
+def filter_role():
+   
+    status = request.args.get('role', 'all')
+    query = {} if status == 'all' else {"Job": status}
+
+    users = list(collection.find(query))  
+    return render_template('user_overview.html', users=users, selected_role=status)
+
 
 @admin.route("/visitor_over",methods=['POst','GET'])
 def visitor_over():
-    return render_template ('visitor_overview.html', rejectobj=rejectobj, visitobj=visitobj)  
+
+    status = request.args.get('status', 'all')
+    query = {} if status == 'all' else {"status": status}
+
+    users = list(visitors_status.find(query))  
+    return render_template('visitor_overview.html', users=users, status_filter=status) 
 
 
 @admin.route("/admin_h",methods=['POst','GET'])
