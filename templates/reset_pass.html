@@ -1,23 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Password</title>
-    <link href="../static/Style2.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reset Password</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #f8f9ff, #ffffff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .reset-container {
+      background: #ffffff;
+      padding: 40px 35px;
+      width: 100%;
+      max-width: 400px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .reset-container h2 {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #2c3e50;
+    }
+
+    .reset-container p {
+      text-align: center;
+      font-size: 14px;
+      color: #6c757d;
+      margin-bottom: 25px;
+    }
+
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #ced4da;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: 0.3s border-color ease;
+    }
+
+    input[type="password"]:focus {
+      border-color: #007BFF;
+      outline: none;
+    }
+
+    .reset-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #0056b3;
+    }
+
+    .error-message {
+      font-size: 13px;
+      color: #e74c3c;
+      margin-bottom: 10px;
+      text-align: center;
+      display: none;
+    }
+
+    .success-message {
+      font-size: 13px;
+      color: #28a745;
+      margin-bottom: 10px;
+      text-align: center;
+      display: none;
+    }
+  </style>
 </head>
 <body>
-    <div class="reset-container">
-        <div class="reset-card">
-            <h2>Reset Password</h2>
-            <p>Enter your new password and confirm it to reset your password.</p>
-            <form id="resetForm" action="{{url_for('otp_gen.reset_password')}}"method='POST'>
-                <input type="password" name="new_pass" placeholder="New Password" required  onChange="onChange()">
-                <input type="password" name="confirm_pass" placeholder="Confirm Password" required onChange="onChange()">
-                <button type="submit" class="reset-btn">Submit</button>
-            </form>
-          
-        </div>
-    </div>
+
+  <div class="reset-container">
+    <h2>Reset Password</h2>
+    <p>Enter your new password and confirm it.</p>
+
+    <form id="resetForm" action="{{ url_for('otp_gen.reset_password') }}" method="POST" onsubmit="return validatePassword();">
+      <input type="password" name="new_pass" id="new_pass" placeholder="New Password" required />
+      <input type="password" name="confirm_pass" id="confirm_pass" placeholder="Confirm Password" required />
+      
+      <div class="error-message" id="errorMsg">Passwords do not match!</div>
+      <div class="success-message" id="successMsg">Passwords match!</div>
+
+      <button type="submit" class="reset-btn">Submit</button>
+    </form>
+  </div>
+
+  <script>
+    const newPass = document.getElementById("new_pass");
+    const confirmPass = document.getElementById("confirm_pass");
+    const errorMsg = document.getElementById("errorMsg");
+    const successMsg = document.getElementById("successMsg");
+
+    function validatePassword() {
+      if (newPass.value !== confirmPass.value) {
+        errorMsg.style.display = "block";
+        successMsg.style.display = "none";
+        return false;
+      } else {
+        errorMsg.style.display = "none";
+        successMsg.style.display = "block";
+        return true;
+      }
+    }
+
+    newPass.oninput = confirmPass.oninput = () => {
+      if (confirmPass.value.length === 0) {
+        errorMsg.style.display = "none";
+        successMsg.style.display = "none";
+      } else if (newPass.value === confirmPass.value) {
+        successMsg.style.display = "block";
+        errorMsg.style.display = "none";
+      } else {
+        errorMsg.style.display = "block";
+        successMsg.style.display = "none";
+      }
+    };
+  </script>
+
 </body>
 </html>

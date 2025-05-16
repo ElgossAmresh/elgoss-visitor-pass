@@ -31,7 +31,7 @@
         <div class="card text-center profile-card bg-light p-4">
             <div class="card-body">
                 <div class="d-flex justify-content-center">
-                    <img src="{{ user_data.image }}"  alt="Profile Image" class="profile-img mb-3">
+                <img src="{{ url_for('auth.profile_image') }}" alt="Profile Image" class="profile-img">
                 </div>
                 <h3 class="card-title">{{ name }}</h3>
                 <p class="card-text text-muted">{{ email }}</p>

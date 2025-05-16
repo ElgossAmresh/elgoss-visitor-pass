@@ -79,33 +79,33 @@ def securitydash():
 @security.route("/visitor", methods=["GET"])
 def visitor():   
     
-    start_date_str = request.args.get('start_date')
-    end_date_str = request.args.get('end_date')
-    print(f"startdate+++{start_date_str},end date---------{end_date_str}")
-    query = {}
-    visitobj = []
+    # start_date_str = request.args.get('start_date')
+    # end_date_str = request.args.get('end_date')
+    # print(f"startdate+++{start_date_str},end date---------{end_date_str}")
+    # query = {}
+    # visitobj = []
 
-    if start_date_str and end_date_str:
-        try:
-            # Parse dates from string to datetime
-            start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
-            end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
-            end_date = end_date.replace(hour=23, minute=59, second=59)  # include full end day            
-            query = {
-                'Date': {
-                    '$gte': start_date,
-                    '$lte': end_date
-                }
-            }
-            print(f"quer++===================={query}")
-            visitobj = list(visitors_status.find(query))
-            print(f"store data in db {visitobj}")
-        except ValueError:            
-            visitobj = []
+    # if start_date_str and end_date_str:
+    #     try:
+    #         # Parse dates from string to datetime
+    #         start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+    #         end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+    #         end_date = end_date.replace(hour=23, minute=59, second=59)  # include full end day            
+    #         query = {
+    #             'Date': {
+    #                 '$gte': start_date,
+    #                 '$lte': end_date
+    #             }
+    #         }
+    #         print(f"quer++===================={query}")
+    #         visitobj = list(visitors_status.find(query))
+    #         print(f"store data in db {visitobj}")
+    #     except ValueError:            
+    #         visitobj = []
 
-    else:        
+    # else:        
         visitobj = list(visitors_status.find())
-    return render_template("visitor.html",visitobj=visitobj)
+        return render_template("visitor.html",visitobj=visitobj,rvis=visitobj)
     
 
 

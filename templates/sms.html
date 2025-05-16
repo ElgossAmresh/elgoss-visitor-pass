@@ -1,18 +1,104 @@
-
 {% extends 'security_base.html' %}
 
-{% block title %}otp{% endblock title %}
+{% block title %}OTP Verification{% endblock title %}
+
+{% block body %}
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(to right white, #c2e9fb);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .otp-box {
+        background: #fff;
+        padding: 30px 25px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 100%;
+        max-width: 400px;
+        animation: fadeIn 0.5s ease;
+        margin-left: 400px; /* 🔧 fixed */
+        height: 380px;
+    }
+
+    .otp-box h1 {
+        font-size: 26px;
+        color: #333;
+        margin-bottom: 45px;
+    }
+
+    .pv {
+        margin-top: 38px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+        color: #777;
+        margin-bottom: 25px;
+    }
+
+    form input[type="tel"] {
+        width: 100%;
+        padding: 14px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        font-size: 16px;
+        margin-bottom: 20px;
+        transition: border-color 0.3s ease;
+    }
+
+    form input[type="tel"]:focus {
+        border-color: #4CAF50;
+        outline: none;
+    }
+
+    form button {
+        width: 100%;
+        padding: 14px;
+        background-color: #4CAF50;
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    form button:hover {
+        background-color: #43a047;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media screen and (max-width: 480px) {
+        .otp-box {
+            padding: 20px 15px;
+            margin-left: 0;
+        }
+    }
+</style>
+
+<div class="otp-box">
+    <h1 class="pv">Phone Verification</h1>
+    <p class="subtitle">Enter your mobile number to receive an OTP</p>
+    
+    <form method="POST" action="{{ url_for('otp_gen.send_sms') }}">
+    <input type="tel" name="phone" placeholder="Enter Mobile Number" 
+           pattern="^\+?[0-9]{10,12}$" maxlength="13" required
+           oninput="this.value = this.value.replace(/(?!^\+)[^\d]/g, '')">
+    <button type="submit">Send OTP</button>
+</form>
 
 
-
-{% block body %}  
-<link href="../static/sms.css" rel="stylesheet" />
-    <div class="container">
-        <h2>Enter Your Phone Number</h2>
-        <form method="POST" action="{{url_for('otp_gen.send_sms')}}">
-            <input type="text" name="phone" placeholder="Enter Phone Number" required>
-            <button type="submit">Get OTP</button>
-        </form>
-    </div>
+</div>
 {% endblock body %}
-

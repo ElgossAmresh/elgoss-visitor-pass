@@ -17,8 +17,8 @@
     {% endif %}
   {% endwith %}
     <div class="otp-container">
-        <h2>Please enter the one time password<br> to verify your account</h2>
-        <p>A code has been sent to ******987</p>
+        <h1>OTP Verification</h1><br><p>Enter the OTP below to verify it.</p>
+        <p>One Time Password(OTP) has been sent via Phone to ******987</p>
         <form id="otpForm" action="{{url_for('otp_gen.match')}}" method="POST">
             <div class="otp-inputs">
                 <input type="text" maxlength="1" class="otp-box" required name="o">

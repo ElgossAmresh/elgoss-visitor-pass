@@ -64,37 +64,7 @@
 </head>
 <body>
 
-<div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 300px">
-    <i class="fa fa-calendar"></i>&nbsp;
-    <span></span> <i class="fa fa-caret-down"></i>
-</div>
 
-<script type="text/javascript">
-$(function() {
-    var start = moment().subtract(29, 'days');
-    var end = moment();
-
-    function cb(start, end) {
-        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-    }
-
-    $('#reportrange').daterangepicker({
-        startDate: start,
-        endDate: end,
-        ranges: {
-           'Today': [moment(), moment()],
-           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-           'This Month': [moment().startOf('month'), moment().endOf('month')],
-           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-        }
-    }, cb);
-
-    cb(start, end);
-});
-</script>
-  
 
 
     
@@ -162,25 +132,21 @@ ADD User
                      </div>
 
 
-                     <!-- Job -->
-                     <div class="input-group col-lg-12 mb-4">
-                      <div class="input-group-prepend">
-                          <span class="input-group-text bg-white px-4 border-md border-right-0">
+                               <!-- Job -->
+                                        <div class="input-group col-lg-12 mb-4">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-white px-4 border-md border-right-0">
                               <i class="fa fa-black-tie text-muted"></i>
                           </span>
-                      </div>
-                      <select
-                          id="jobtitle"
-                          name="jobtitle"
-                          class="form-control bg-white border-md border-left-0 pl-3"
-                          required
-                      >
+                                            </div>
+                                            <select id="jobtitle" name="jobtitle" class="form-control bg-white border-md border-left-0 pl-3" required>
                           <option value="">Select Job Title</option> <!-- Default option -->
                           <option value="Security">Security</option>
                           <option value="Admin">Admin</option>
                           <option value="Intern">Intern</option>
                       </select>
-                  </div>                 
+                                        </div>
+                
 
                      <!-- Password -->
                      <div class="input-group col-lg-6 mb-4">
@@ -248,9 +214,12 @@ ADD User
 
       
         <!-- Delete Button -->
+        {% if adm['Phone'] %}
         <form action="{{ url_for('admin.deleteuser', Phone=adm['Phone']) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete();">
-          <button type="submit" class="btn btn-danger">Delete</button>
+            <button type="submit">Delete</button>
         </form>
+      {% endif %}
+      
       </td>
       
       

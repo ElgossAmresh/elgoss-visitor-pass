@@ -1,70 +1,100 @@
-{% extends 'security_base.html' %}
-
-{% block title %}Active Visitors{% endblock title %}
-
-{% block body %}
+{% extends 'security_base.html' %} {% block title %}Active Visitors{% endblock title %} {% block body %}
 <!-- Bootstrap & DataTables CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">  
-<!-- Daterangepicker CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
-<!-- Date Range Picker -->
-<div class="mt-5">
-<form id="dateForm" method="GET" action="{{url_for('security.visitor')}}">
-    
-    <input type="hidden" id="start_date" name="start_date" value="{{ request.args.get('start_date', '') }}">
-    <input type="hidden" id="end_date" name="end_date" value="{{ request.args.get('end_date', '') }}">
-  
-    <!-- Date Range Picker UI -->
-    <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 300px">
-      <i class="fa fa-calendar"></i>&nbsp;
-      <span></span> <i class="fa fa-caret-down"></i>
+<div class="container-fluid mt-5">
+    <!-- Date Range Picker
+    <form id="dateForm" method="GET" action="{{url_for('security.visitor')}}">
+        <input type="hidden" id="start_date" name="start_date" value="{{ request.args.get('start_date', '') }}">
+        <input type="hidden" id="end_date" name="end_date" value="{{ request.args.get('end_date', '') }}">
+
+        
+    </form> -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+    <div class="container mt-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div id="reportrange" class="btn btn-outline-primary d-flex align-items-center">
+                <i class="bi bi-calendar-event me-2"></i>
+                <span></span>
+                <!-- Date range will be inserted here -->
+                <i class="bi bi-caret-down-fill ms-2"></i>
+            </div>
+        </div>
     </div>
-  </form>
-</div>
+    <!-- Required JS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
+    <script>
+        $(function() {
+            var start = moment().subtract(6, 'days');
+            var end = moment();
 
- 
+            function cb(start, end) {
+                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            }
 
-<!-- Table -->
-<div class="table-responsive">
-  <table id="example" class="table table-striped table-bordered nowrap" style="width:100%">
-    <thead class="table-dark">
-      <tr>
-        <th>Sr No</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Phone No</th>
-        <th>Card</th>
-        <th>UID No</th>
-        <th>Gender</th>
-        <th>Purpose</th>
-        <th>Approved</th>
-        <th>Entry Details</th>
-        <th>Exit Details</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for visitor in visitobj %}
-      <tr>
-        <td>{{ loop.index }}</td>
-        <td>{{ visitor['Name'] }}</td>
-        <td>{{ visitor['Email'] }}</td>
-        <td>{{ visitor['phone'] }}</td>
-        <td>{{ visitor['Card'] }}</td>
-        <td>{{ visitor['UID'] }}</td>
-        <td>{{ visitor['Gender'] }}</td>
-        <td>{{ visitor['Purpose'] }}</td>
-        <td>{{ visitor['Approvedby'] }}</td>
-        <td>{{ visitor['Date'] }}</td>
-        <td>{{ visitor['Exittime'] }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+            $('#reportrange').daterangepicker({
+                startDate: start,
+                endDate: end,
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+
+            // Call cb() to set initial text
+            cb(start, end);
+        });
+    </script>
+    <!-- Table -->
+    <div class="table-responsive mt-4">
+        <table id="example" class="table table-striped table-bordered nowrap w-100">
+            <thead class="table-dark">
+                <tr>
+                    <th>Sr No</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone No</th>
+                    <th>Card</th>
+                    <th>UID No</th>
+                    <th>Gender</th>
+                    <th>Purpose</th>
+                    <th>Approved</th>
+                    <th>Entry Details</th>
+                    <th>Exit Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for visitor in visitobj %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ visitor['Name'] }}</td>
+                    <td>{{ visitor['Email'] }}</td>
+                    <td>{{ visitor['phone'] }}</td>
+                    <td>{{ visitor['Card'] }}</td>
+                    <td>{{ visitor['UID'] }}</td>
+                    <td>{{ visitor['Gender'] }}</td>
+                    <td>{{ visitor['Purpose'] }}</td>
+                    <td>{{ visitor['Approvedby'] }}</td>
+                    <td>{{ visitor['Date'] }}</td>
+                    <td>{{ visitor['Exittime'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <!-- Scripts -->
@@ -74,49 +104,38 @@
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
-
 <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
 <script>
-  // Date Range Picker
-  $(function () {
-    alert("hello jeet");
-  // var start = moment().subtract(29, 'days');
-  // var end = moment();
+    $(document).ready(function() {
+        // Initialize DataTable
+        $('#example').DataTable({
+            responsive: true
+        });
 
-  // function cb(start, end) {
-  //   $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-
-  //   // Set values in hidden inputs
-  //   $('#start_date').val(start.format('YYYY-MM-DD'));
-  //   $('#end_date').val(end.format('YYYY-MM-DD'));
-
-    
-  //   $('#dateForm').submit();
-  // }
-
-  // $('#reportrange').daterangepicker({
-  //   startDate: start,
-  //   endDate: end,
-  //   ranges: {
-  //     'Today': [moment(), moment()],
-  //     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-  //     'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-  //     'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-  //     'This Month': [moment().startOf('month'), moment().endOf('month')],
-  //     'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-  //   }
-  // }, cb);
-
-  // cb(start, end); // Trigger initial call
-});
-
-  // DataTable Initialization
-  $(function () {
-    $('#example').DataTable({
-      responsive: true
+        // Date Range Picker (optional – enable if needed)
+        // const start = moment().subtract(29, 'days');
+        // const end = moment();
+        // function cb(start, end) {
+        //   $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        //   $('#start_date').val(start.format('YYYY-MM-DD'));
+        //   $('#end_date').val(end.format('YYYY-MM-DD'));
+        //   $('#dateForm').submit();
+        // }
+        // $('#reportrange').daterangepicker({
+        //   startDate: start,
+        //   endDate: end,
+        //   ranges: {
+        //     'Today': [moment(), moment()],
+        //     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        //     'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        //     'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+        //     'This Month': [moment().startOf('month'), moment().endOf('month')],
+        //     'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        //   }
+        // }, cb);
+        // cb(start, end);
     });
-  });
 </script>
 {% endblock body %}

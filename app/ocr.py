@@ -3,7 +3,7 @@ import cv2
 from flask import Blueprint, request
 import pytesseract
 from PIL import Image
-from datetime import datetime
+from datetime import date,time,datetime
 from models.database import otp_send
 phone_data = otp_send.find_one({"phone": {"$ne": None}})  # Get a document where phone is NOT None
 if phone_data:
@@ -14,7 +14,10 @@ else:
 
 global data
 data=None
-now = datetime.now().isoformat()
+
+now = datetime.now()          
+current_date = now.date()     
+current_time = now.time()    
 ocr = Blueprint('ocr', __name__)
 def extract_card_details(filename):
     pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -51,7 +54,8 @@ def extract_card_details(filename):
     elif "male" in text.lower() or "VID" in text:
         data = adhaar_read_data(text)
     with io.open('info.json', 'w', encoding='utf-8') as outfile:
-        data = json.dumps(data, indent=4, sort_keys=True, separators=(',', ': '), ensure_ascii=False)
+        data = json.dumps(data, indent=4, sort_keys=True, separators=(',', ': '), ensure_ascii=False, default=str)
+
         outfile.write(data)  # Direct string writing, no conversion needed
     with open('info.json', encoding='utf-8') as data_file:
         data_loaded = json.load(data_file)
@@ -82,7 +86,8 @@ def adhaar_read_data(text):
 
     data={
         "phone":phone,
-        "Date":now,
+        "Date":current_date,
+        "Time":current_time,
         "card": "Aadhaar",
         "UID": aadhaar_number.group(0) if aadhaar_number else None,
         "Name": name_match.group(1) if name_match else None,
@@ -103,7 +108,8 @@ def pan_read_data(text):
 
     data= {
         "phone":phone,
-        "Date":now,
+        "Date":current_date,
+        "Time":current_time,
         "card": "pan",
         "UID": pan_number.group(0) if pan_number else None,
         "Name": name_match.group(1) if name_match else None,

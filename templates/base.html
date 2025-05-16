@@ -1,115 +1,201 @@
-<script type="text/javascript">
-  const chartData = {{ {
-    "months": months,
-    "acceptData": accept_data,
-    "totalData": total_data
-  } | tojson | safe }};
-</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Profile (SAP Styled)</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "72", "Segoe UI", sans-serif;
+      background: #f4f4f4;
+    }
 
+    .container {
+      display: flex;
+      padding: 20px;
+    }
 
+    .sidebar {
+      width: 250px;
+      background: #fff;
+      text-align: center;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      margin-right: 20px;
+    }
 
-<script>
-  if (document.querySelector(".chart-line")) {
-    var chartsLine = document.querySelectorAll(".chart-line");
+    .profile-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
 
-    chartsLine.forEach(function(chart) {
-      var ctx = chart.getContext("2d");
+    .upload-btn {
+      display: inline-block;
+      background: #0070f2;
+      color: white;
+      padding: 6px 12px;
+      margin-top: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
 
-      var gradientStroke1 = ctx.createLinearGradient(0, 230, 0, 50);
-      gradientStroke1.addColorStop(1, "rgba(203,12,159,0.2)");
-      gradientStroke1.addColorStop(0.2, "rgba(72,72,176,0.0)");
-      gradientStroke1.addColorStop(0, "rgba(203,12,159,0)");
+    main.profile-form {
+      flex: 1;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
 
-      var gradientStroke2 = ctx.createLinearGradient(0, 230, 0, 50);
-      gradientStroke2.addColorStop(1, "rgba(20,23,39,0.2)");
-      gradientStroke2.addColorStop(0.2, "rgba(72,72,176,0.0)");
-      gradientStroke2.addColorStop(0, "rgba(20,23,39,0)");
+    .profile-form h1 {
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
 
-      if (!chart.getAttribute('data-chart-initialized')) {
-        new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: chartData.months,
-            datasets: [{
-              label: "Accept Visitors",
-              tension: 0.4,
-              borderColor: "#cb0c9f",
-              borderWidth: 3,
-              backgroundColor: gradientStroke1,
-              fill: true,
-              data: chartData.acceptData,
-            }, {
-              label: "Total Visitors",
-              tension: 0.4,
-              borderColor: "#3A416F",
-              borderWidth: 3,
-              backgroundColor: gradientStroke2,
-              fill: true,
-              data: chartData.totalData,
-            }],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            interaction: { intersect: false, mode: "index" },
-            scales: {
-              y: {
-                ticks: { color: "#b2b9bf", font: { size: 11 } },
-                grid: { drawBorder: false, borderDash: [5, 5] }
-              },
-              x: {
-                ticks: { color: "#b2b9bf", font: { size: 11 } },
-                grid: { display: false }
-              }
-            }
-          }
-        });
-        chart.setAttribute("data-chart-initialized", "true");
-      }
-    });
-  }
-</script>
+    .profile-form section {
+      margin-bottom: 30px;
+    }
 
+    .profile-form h3 {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
 
- 
- <!-- SAFELY inject Flask values into JS -->
-<script>
-const pieData = JSON.parse('{{ [total, active, rejectobj]|tojson | safe }}');
-</script>
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 15px;
+    }
 
-<script>
-var chartsPie = document.querySelectorAll(".chart-pie");
+    input.sap-input,
+    select.sap-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #d1d1d1;
+      border-radius: 4px;
+      background-color: #fff;
+      font-size: 14px;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease-in-out;
+    }
 
-chartsPie.forEach(function(chart) {
-if (!chart.getAttribute('data-chart-initialized')) {
-new Chart(chart, {
-type: "pie",
-data: {
-  labels: ["Total", "Active", "Rejected"],
-  datasets: [{
-    data: pieData,
-    backgroundColor: [
-      window.theme?.primary || "#007bff",
-      window.theme?.warning || "#ffc107",
-      window.theme?.danger || "#dc3545"
-    ],
-    borderWidth: 5
-  }]
-},
-options: {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: { display: false }
-  },
-  cutout: "75%"
-}
-});
-chart.setAttribute("data-chart-initialized", "true");
-}
-});
-</script>
+    input.sap-input:focus,
+    select.sap-input:focus {
+      outline: none;
+      border-color: #0070f2;
+      box-shadow: 0 0 0 2px rgba(0,112,242,0.2);
+    }
 
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
 
-{% endblock body %}  
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn.update {
+      background: #0a6ed1;
+      color: white;
+    }
+
+    .btn.reset {
+      background: #6c757d;
+      color: white;
+    }
+
+    label {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <img src="https://via.placeholder.com/120" alt="Profile Picture" class="profile-img" />
+      <h2>subham Patel</h2>
+      <p>Web Designer</p>
+      <input type="file" id="upload" hidden />
+      <label for="upload" class="upload-btn">Change Picture</label>
+    </aside>
+
+    <main class="profile-form">
+      <h1>Edit Profile</h1>
+      <form>
+        <section>
+          <h3>General</h3>
+          <div class="form-grid">
+            <input type="text" placeholder="First Name" class="sap-input" />
+            <input type="text" placeholder="Last Name" class="sap-input" />
+            <input type="text" placeholder="Email" class="sap-input" />
+            <input type="date" placeholder="Date of Birth" class="sap-input" />
+            <select class="sap-input">
+              <option selected disabled>Department</option>
+              <option>Design</option>
+              <option>Development</option>
+            </select>
+            <select class="sap-input">
+              <option selected disabled>Skills</option>
+              <option>HTML</option>
+              <option>CSS</option>
+              <option>JS</option>
+              <option>JAVA</option>
+              <option>PHP</option>
+              <option>Python</option>
+              <option>C#</option>
+              <option>Node.js</option>
+              <option>My SQL</option>
+              <option>React.js</option>
+              <option>C</option> 
+              <option>QT</option>
+              
+
+            </select>
+            <select class="sap-input">
+              <option selected disabled>Gender</option>
+              <option>Male</option>
+              <option>Female</option>
+            </select>
+            <input type="text" placeholder="Company" class="sap-input" />
+          </div>
+        </section>
+
+        <section>
+          <h3>Contact</h3>
+          <div class="form-grid">
+            <input type="text" placeholder="Contact Number" class="sap-input" required />
+            <input type="" placeholder="Confirm Number" class="sap-input" required />
+          </div>
+        </section>
+
+        <section>
+          <h3>Address</h3>
+          <div class="form-grid">
+            <input type="text" placeholder="Street" class="sap-input" />
+            <input type="text" placeholder="State" class="sap-input" />
+            <input type="text" placeholder="ZIP" class="sap-input" />
+            <input type="text" placeholder="City" class="sap-input" />
+            <input type="text" placeholder="Country" class="sap-input" />
+          </div>
+        </section>
+
+        <div class="form-actions">
+          <button type="submit" class="btn update">Update</button>
+          <button type="reset" class="btn reset">Reset</button>
+        </div>
+      </form>
+    </main>
+  </div>
+</body>
+</html>

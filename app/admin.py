@@ -1,7 +1,7 @@
-from flask import Blueprint, request, redirect, url_for,render_template,flash,request
+from flask import Blueprint, request, redirect, url_for,render_template,flash,request,session
 from werkzeug.security import generate_password_hash
 from models.database import collection, adminlog, securitylog,visitorlogtable,activevisitorstable,reqvistable,rejectedvistable,visitors_status
-from datetime import datetime
+from datetime import date,datetime
 from flask_bcrypt import Bcrypt
 from bson import ObjectId
 from collections import defaultdict
@@ -23,12 +23,15 @@ countvis = len(visitobj)
 active = len(activeobj)
 
 total=reject+countvis
+now = datetime.now()          
+current_date = now.date().isoformat() 
+current_time = now.time().isoformat()  
 
 @admin.route('/admindash')
 
 def admindash():
 
-    global months,accept_data,total_data
+    global months,accept_data,total_data,Name
     all_visitors = list(visitors_status.find({}))  
 
     monthly_stats = defaultdict(lambda: {"accept": 0, "total": 0})
@@ -53,7 +56,13 @@ def admindash():
               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     accept_data = [monthly_stats[m]["accept"] for m in months]
     total_data = [monthly_stats[m]["total"] for m in months]
-    
+    if session.get('user_id'):
+        email = session.get('user_id')
+        user_data = collection.find_one({"Email": email})
+        if user_data :
+            # Convert _id to string
+            user_data['_id'] = str(user_data['_id'])
+            Name = user_data.get('Name', '') 
 
 
 
@@ -71,18 +80,26 @@ def add_admin():
             Phone=request.form['phone']
             Job=request.form['jobtitle']
             Password=request.form['password']
-            today = datetime.now()
+            date = current_date
+            time=current_time
+
             hashed_password = generate_password_hash(Password)
             # hashed_password = bcrypt.generate_password_hash(Password).decode('utf-8')
             new_admin = {
                 "Name":Name,
                 "Email":Email,
                 "Phone":Phone,
-                "Date":today,
+                "Date":date,
+                "Time":time,
                 "Job":Job,
-                "Password":hashed_password 
+                "Password":hashed_password ,                  
+               'profile_image': {
+                   'image_name':'dummy.png',
+                   'thumbnail':'test'
+               } 
+        }
 
-            }
+            
             collection.insert_one(new_admin)
             adminlog.insert_one(new_admin)
         return redirect(url_for('admin.admindash'))
@@ -165,7 +182,7 @@ def admin_h():
             # Convert string to datetime if needed
             if isinstance(dt, str):
                 try:
-                      dt = datetime.fromisoformat(dt)
+                      dt = date.fromisoformat(dt)
                 except ValueError:
                     continue  
 
@@ -181,3 +198,35 @@ def admin_h():
     total_data = [monthly_stats[m]["total"] for m in months]
     return render_template ("admin_h.html",  pending=pending ,total=total,countvis=countvis, active=active,rejectobj=reject,
                            months=months, accept_data=accept_data, total_data=total_data)  
+   
+
+
+
+
+
+
+
+@admin.route('/submit_date_range', methods=['POST'])
+def submit_date_range():
+    start_date = request.form.get('start_date')
+    end_date = request.form.get('end_date')
+
+    # start_dt = date.strptime(start_date, '%Y-%m-%d')
+    # end_dt = date.strptime(end_date, '%Y-%m-%d')
+    # end_dt = end_dt.replace(hour=23, minute=59, second=59)
+
+    print(f"[INFO] Date range submitted: {start_date} to {end_date}")
+
+    results = list(visitors_status.find({
+        "Date": {
+            "$gte": start_date,
+            "$lte": end_date 
+        }
+        
+    }))
+    
+    # for r in results:
+    #     r["_id"] = str(r["_id"])
+    #     r["timestamp"] = r["timestamp"].strftime("%d-%b-%Y %H:%M")
+    
+    return render_template("visitor.html",  visitobj=results)
