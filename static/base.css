@@ -181,19 +181,23 @@
             }
             
             .card1 {
-                background-color: #6ffdbd;
+                background: linear-gradient(to right, #abffe6, #39b98c);
+
             }
             
             .card2 {
-                background-color: #dfa2a2;
+                background: linear-gradient(to right, #a5cae8, #3e90b0);
+
             }
             
             .card3 {
-                background-color: #919d4c;
+                 background: linear-gradient(to right, #c8e5fe, #3766a1);
+
             }
             
             .card4 {
-                background-color: #d9bbf8;
+                background: linear-gradient(to right, #f0cbc9,#a13a28);
+
             }
             
             .text-info.h4 {

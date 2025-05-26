@@ -1,51 +1,83 @@
-body {
-    font-family: Arial, sans-serif;
-    background: #dacfe3;
-}
-.container {
-    width: 400px;
-    height: 400px;
-    text-align: center;
-    margin: 170px auto;
-    background: rgb(235, 229, 237);
-    padding: 50px;
-    border-radius: 30px;
-    box-shadow: 0px 0px 20px rgb(227, 223, 229);
-    justify-content: center; 
-}
-.hii{
-  margin: 20px;
-}
 
-.helo{
-  margin: 10px;
-}
+    body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(to right white, #c2e9fb);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-input, button {
-    width: 80%;
-    padding: 10px;
-    margin: 20px 0;
-    border-radius: 30px;
-}
-button {
-    background-color: #007bff;
-    color: rgb(5, 5, 5);
-    border: none;
-}
-.ver{
-  width: 70%;
-}
-#otpBoxes {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-.otp-box {
-  width: 30px;
-  height: 30px;
-  text-align: center;
-  font-size: 24px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
+    .otp-box {
+        background: #fff;
+        padding: 30px 25px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 100%;
+        max-width: 400px;
+        animation: fadeIn 0.5s ease;
+        margin-left: 400px; /* 🔧 fixed */
+        height: 380px;
+    }
+
+    .otp-box h1 {
+        font-size: 26px;
+        color: #333;
+        margin-bottom: 45px;
+    }
+
+    .pv {
+        margin-top: 38px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+        color: #777;
+        margin-bottom: 25px;
+    }
+
+    form input[type="tel"] {
+        width: 100%;
+        padding: 14px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        font-size: 16px;
+        margin-bottom: 20px;
+        transition: border-color 0.3s ease;
+    }
+
+    form input[type="tel"]:focus {
+        border-color: #4CAF50;
+        outline: none;
+    }
+
+    form button {
+        width: 100%;
+        padding: 14px;
+        background-color: #4CAF50;
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    form button:hover {
+        background-color: #43a047;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media screen and (max-width: 480px) {
+        .otp-box {
+            padding: 20px 15px;
+            margin-left: 0;
+        }
+    }

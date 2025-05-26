@@ -60,7 +60,7 @@ def login():
 
             )
             print(f"user type:{type(user)}")
-            session['user_id'] = email   
+            session['user_id'] = user.email   
             session['username'] = user.username 
             session['profile_image'] = user.profile_image  
             session['Job']=user.Job         
@@ -143,9 +143,8 @@ def update_profile_all():
         return redirect(url_for('auth.login'))
     if request.method == 'POST':
             email = session['user_id']
-           
-           
-    updated_data = {
+                  
+    updated_data = { 
         'Name': request.form.get('firstName'),
         'lastName': request.form.get('lastName'),
         'Phone': request.form.get('Phone'),
@@ -153,12 +152,11 @@ def update_profile_all():
         'City': request.form.get('City'),
         'State': request.form.get('State'),
         'Zip': request.form.get('Zip'),
+        'Email': request.form.get('Email'),
+
         'Country': request.form.get('Country')
         
     }
-    
-
-
     result = collection.update_one({'Email': email}, {'$set': updated_data})
 
     flash("Profile updated successfully!" if result.modified_count else "No changes made.")
@@ -181,7 +179,7 @@ def upload_profile_image():
         save_path = os.path.join('static/images', filename)
         file.save(save_path)
         THUMBNAIL_SIZE = (100, 100)
-        
+                                
         if not file or not file.filename.endswith(('.jpg', '.jpeg', '.png')):
                 return render_template('update_profile.html', message="Invalid file type. Use JPG or PNG.")
 

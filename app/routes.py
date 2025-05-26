@@ -5,18 +5,13 @@ from app.camera_manager import release_camera
 from flask_login import login_required
 
 routes = Blueprint('routes', __name__, template_folder='templates')
-# @routes.route('/', methods=['GET', 'POST'])
-# def index():  
-#   print("hello this is register")
-#   return render_template('register.html')
+
 
 
 @routes.route('/')
 @login_required
 def login():
   return render_template('login.html')
-
-
 
 
 

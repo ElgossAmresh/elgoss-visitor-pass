@@ -1,98 +1,136 @@
 {% extends 'security_base.html' %} {% block title %}Home{% endblock %} {% block body %}
 
 
-<!-- Dashboard Header-->
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h3>Dashboard Summary</h3>
-    <p class="text-muted">{{ current_time }}</p>
-</div>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
+
+   
+<div class="row g-3 mt-5">
+
+    <!-- Card 1 - Active Visitors -->
+    <div class="col-md-3">
+    <a href="{{ url_for('security.security_home', filter='accepted') }}" style="text-decoration: none;">
+        <div class="card1 text-center p-3" id="card-active" style="cursor: pointer;">
+            <h4 class="text-danger m-0">{{active}}</h4>
+            <p class="mb-0"><i class="bi bi-person-fill-check"></i> Active Visitors</p>
+        </div>
+    </a>
+</div>
+
+<!-- Card 2 - Exits -->
+<div class="col-md-3">
+    <a href="{{ url_for('security.security_home', filter='exits') }}" style="text-decoration: none;">
+        <div class="card2 text-center p-3" id="card-exits" style="cursor: pointer;">
+            <h4 class="text-danger m-0">0</h4>
+            <p class="mb-0"><i class="bi bi-box-arrow-right"></i> Exits</p>
+        </div>
+    </a>
+</div>
+
+<!-- Card 3 - Checkpoints -->
+<div class="col-md-3">
+    <a href="{{ url_for('security.security_home', filter='checkpoints') }}" style="text-decoration: none;">
+        <div class="card3 text-center p-3" id="card-checkpoints" style="cursor: pointer;">
+            <h4 class="text-warning m-0">0</h4>
+            <p class="mb-0"><i class="bi bi-geo-alt"></i> Checkpoints</p>
+        </div>
+    </a>
+</div>
+
+<!-- Card 4 - Total Visitors -->
+<div class="col-md-3">
+    <a href="{{ url_for('security.security_home', filter='all') }}" style="text-decoration: none;">
+        <div class="card4 text-center p-3" id="card-total" style="cursor: pointer;">
+            <h4 class="text-dark m-0">{{ total }}</h4>
+            <p class="mb-0"><i class="bi bi-people-fill"></i> Total Visitors</p>
+        </div>
+    </a>
+</div>
+<!-- Date Range and Filter Controls -->
 <div class="container mt-3 ml-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <!-- Date Range Picker -->
         <div id="reportrange" class="btn btn-outline-primary d-flex align-items-center">
             <i class="bi bi-calendar-event me-2"></i>
             <span></span>
-            <!-- Date range will be inserted here -->
             <i class="bi bi-caret-down-fill ms-2"></i>
+        </div>
+
+        <!-- Status Dropdown Filter -->
+        <form method="get" action="{{ url_for('security.security_home') }}" class="d-flex align-items-center">
+            <select name="filter" class="form-select me-2">
+                <option value="all" {% if request.args.get('filter') == 'all' %}selected{% endif %}>All</option>
+                <option value="accepted" {% if request.args.get('filter') == 'accepted' %}selected{% endif %}>Accepted</option>
+                <option value="rejected" {% if request.args.get('filter') == 'rejected' %}selected{% endif %}>Rejected</option>
+                <option value="pending" {% if request.args.get('filter') == 'pending' %}selected{% endif %}>Pending</option>
+            </select>
+
+            <!-- Hidden inputs to pass start and end date -->
+            <input type="hidden" name="start_date" id="start_date">
+            <input type="hidden" name="end_date" id="end_date">
+
+            <button type="submit" class="btn btn-primary">Apply</button>
+        </form>
+    </div>
+</div>
+
+
+<!-- Shared Table Section -->
+<div class="col-md-12 mt-3" id="visitorTable" style="display: {{ 'block' if visitobj else 'none' }};">
+    <div class="card p-3">
+        <h5>Visitors Table</h5>
+        <div class="container-fluid mt-3">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered nowrap w-100">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Sr No</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone No</th>
+                            <th>Card</th>
+                            <th>UID No</th>
+                            <th>Gender</th>
+                            <th>Purpose</th>
+                            <th>Status</th>
+                            <th>Approved</th>
+                            <th>Entry Details</th>
+                            <th>Exit Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for visitor in visitobj %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ visitor['Name'] }}</td>
+                            <td>{{ visitor['Email'] }}</td>
+                            <td>{{ visitor['phone'] }}</td>
+                            <td>{{ visitor['Card'] }}</td>
+                            <td>{{ visitor['UID'] }}</td>
+                            <td>{{ visitor['Gender'] }}</td>
+                            <td>{{ visitor['Purpose'] }}</td>
+                            <td>{{ visitor['status'] }}</td>
+                            <td>{{ visitor['Approvedby'] }}</td>
+                            <td>{{ visitor['Date'] }}</td>
+                            <td>{{ visitor['Exittime'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
-<div class="row g-3 mt-2">
-    <div class="col-md-3">
-        <a href="{{ url_for('security.security_home',) }}" class="card1 text-center p-3 w-100 d-block" style="cursor: pointer; height: 100px; text-decoration: none;">
-            <h4 class="text-primary m-0">{{ countvis }} <i class="bi bi-person-check-fill"></i></h4>
-            <p class="mb-0"> Entries</p>
-        </a>
-    </div>
-
-    <div class="col-md-3">
-        <button class="card2 w-100   text-center p-3" style="cursor: pointer; height: 100px;">
-        <h4 class="text-danger m-0">0 <i class="bi bi-box-arrow-right"></i></h4>
-        <p class="mb-0">Exits</p>
-    </button>
-    </div>
-
-    <div class="col-md-3">
-        <button class="card3  w-100  text-center p-3" style="cursor: pointer;height: 100px;">
-        <h4 class="text-warning m-0">0 <i class="bi bi-geo-alt"></i></h4>
-        <p class="mb-0">Checkpoints</p>
-    </button>
-    </div>
-
-    <div class="col-md-3">
-        <button class="card4  w-100 text-center p-3" style="cursor: pointer;height: 100px;">
-        <h4 class="text-dark m-0"><i class="bi bi-people-fill me-2"></i> {{ total }} </h4>
-        <p class="mb-0">Total Visitors</p>
-    </button>
-    </div>
-</div>
 
 
-<!-- Table -->
-<div class="container-fluid mt-5">
-    <div class="table-responsive">
-        <table id="example" class="table table-striped table-bordered nowrap w-100">
-            <thead class="table-dark">
-                <tr>
-                    <th>Sr No</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone No</th>
-                    <th>Card</th>
-                    <th>UID No</th>
-                    <th>Gender</th>
-                    <th>Purpose</th>
-                    <th>Approved</th>
-                    <th>Entry Details</th>
-                    <th>Exit Details</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for visitor in visitobj %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ visitor['Name'] }}</td>
-                    <td>{{ visitor['Email'] }}</td>
-                    <td>{{ visitor['phone'] }}</td>
-                    <td>{{ visitor['Card'] }}</td>
-                    <td>{{ visitor['UID'] }}</td>
-                    <td>{{ visitor['Gender'] }}</td>
-                    <td>{{ visitor['Purpose'] }}</td>
-                    <td>{{ visitor['Approvedby'] }}</td>
-                    <td>{{ visitor['Date'] }}</td>
-                    <td>{{ visitor['Exittime'] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
 
-    </div>
+<!-- JavaScript -->
 
-</div>
+
 
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js "></script>
@@ -106,7 +144,7 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js "></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js "></script>
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js "></script>
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js "></script>
+
 <script>
     $(document).ready(function() {
         $('#example').DataTable({
@@ -146,6 +184,19 @@
     });
 </script>
 
+<script>
+const cards = ["card-active", "card-exits", "card-checkpoints", "card-total"];
+cards.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) {
+        el.addEventListener("click", function() {
+            const table = document.getElementById("visitorTable");
+            table.style.display = table.style.display === "none" ? "block" : "none";
+        });
+    }
+});
+
+</script>
 
 
 {% endblock %}

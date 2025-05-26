@@ -57,7 +57,8 @@ def deletevis(uid):
     myquery = {"UID": uid}
     newvalues = {"$set": {"Exittime": dt_string}}
     visitorlogtable.update_one(myquery, newvalues)
-    return redirect(url_for('security.securitydash'))
+    # return redirect(url_for('security.securitydash'))
+    return render_template('user_overview.html')
 
 
 @visitor.route('/acceptvis/<uid>', methods=['POST', 'GET'])

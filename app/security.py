@@ -16,7 +16,7 @@ secobj = list(securitylog.find())
 reject=len(rejectobj)
 countvis = len(visitobj)
 active = len(activeobj)
-total=countvis+reject
+# total=countvis+reject
 
 approvedby = ""
 
@@ -55,8 +55,8 @@ def securitydash():
     pan_data={}
  
 
-    from_date = request.form.get('FromDate')
-    to_date = request.form.get('ToDate')
+    from_date = request.form.get('start_date')
+    to_date = request.form.get('end_date')
 
     query = {}
 
@@ -111,12 +111,49 @@ def visitor():
 
 @security.route("/security_home", methods=["GET"])
 def security_home():
+    filter_type = request.args.get("filter", "all")
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+    print(f"start date ============================== {start_date}")
+    query = {}
+
+    # Apply status filter
+    if filter_type == "accepted":
+        query["status"] = "accepted"
+    elif filter_type == "exist":
+        query["status"] = "exist"
+    elif filter_type == "":
+        query["status"] = ""
+
+    
+    if start_date and end_date:
+        try:
+            start_dt = start_date
+            end_dt = end_date
+            # Assuming the 'date' field in your MongoDB is stored as datetime object
+            query["date"] = {"$gte": start_dt, "$lte": end_dt}
+        except ValueError:
+            print("Invalid date format received")
+    
+    print(f"Final MongoDB query: {query}")  # Debugging
+
+    # Query the filtered results
+    visitobj = list(visitors_status.find(query).sort("date", -1))
+
+    # For total stats (not filtered)
+    all_visitors = list(visitors_status.find({}))
+
+    reject = sum(1 for v in all_visitors if v["status"] == "rejected")
+    active = sum(1 for v in all_visitors if v["status"] == "accepted")
+    pending = sum(1 for v in all_visitors if v["status"] == "")
+    total = len(all_visitors)
    
-    return render_template("security_home.html",total=total,countvis=countvis)
+ 
+    return render_template("security_home.html",total=total,countvis=countvis,active=active,visitobj=visitobj)
 
 @security.route('/home', methods=['POST', 'GET'])
 def home():
-    return render_template("security_home.html",total=total,countvis=countvis)
+    return render_template("security_home.html",countvis=countvis)
 @security.route("/overview", methods=["GET"])
 def overview():
     visitobj = list(visitorlogtable.find({"exit_time": None}))

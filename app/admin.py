@@ -13,7 +13,8 @@ bcrypt = Bcrypt()
 visitobj = list(visitorlogtable.find())
 activeobj = list(activevisitorstable.find())
 
-rejectobj = list(rejectedvistable.find())
+rejectobj  = list(visitors_status.find({"Status": "rejected"}))
+
 adminobj = list(adminlog.find())
 secobj = list(securitylog.find())
 reqobj = list(reqvistable.find())
@@ -21,8 +22,10 @@ pending=len(reqobj)
 reject=len(rejectobj)
 countvis = len(visitobj)
 active = len(activeobj)
+visit=list(visitors_status.find())
 
-total=reject+countvis
+totals= list(visitors_status.find()) 
+total=len(totals)
 now = datetime.now()          
 current_date = now.date().isoformat() 
 current_time = now.time().isoformat()  
@@ -66,8 +69,8 @@ def admindash():
 
 
 
-    return render_template('admin_h.html',pending=pending ,total=total,countvis=countvis, active=active,rejectobj=reject,
-                           months=months, accept_data=accept_data, total_data=total_data)
+    return render_template('admin_h.html',  pending=pending ,total=totals,countvis=countvis, active=active,rejectobj=reject,
+                           months=months, accept_data=accept_data, total_data=total_data )
 
 
 @admin.route('/addadmin', methods=['POST'])
@@ -171,8 +174,42 @@ def visitor_over():
 
 @admin.route("/admin_h",methods=['POst','GET'])
 def admin_h():
-    global months,accept_data,total_data
-    all_visitors = list(visitors_status.find({}))  
+    filter_type = request.args.get("filter", "all")
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+    print(f"start date ============================== {start_date}")
+    query = {}
+
+    # Apply status filter
+    if filter_type == "accepted":
+        query["status"] = "accepted"
+    elif filter_type == "rejected":
+        query["status"] = "rejected"
+    elif filter_type == "pending":
+        query["status"] = ""
+
+    
+    if start_date and end_date:
+        try:
+            start_dt = start_date
+            end_dt = end_date
+            # Assuming the 'date' field in your MongoDB is stored as datetime object
+            query["date"] = {"$gte": start_dt, "$lte": end_dt}
+        except ValueError:
+            print("Invalid date format received")
+    
+    print(f"Final MongoDB query: {query}")  # Debugging
+
+    # Query the filtered results
+    visitobj = list(visitors_status.find(query).sort("date", -1))
+
+    # For total stats (not filtered)
+    all_visitors = list(visitors_status.find({}))
+
+    reject = sum(1 for v in all_visitors if v["status"] == "rejected")
+    active = sum(1 for v in all_visitors if v["status"] == "accepted")
+    pending = sum(1 for v in all_visitors if v["status"] == "")
+    total = len(all_visitors)
 
     monthly_stats = defaultdict(lambda: {"accept": 0, "total": 0})
 
@@ -197,36 +234,12 @@ def admin_h():
     accept_data = [monthly_stats[m]["accept"] for m in months]
     total_data = [monthly_stats[m]["total"] for m in months]
     return render_template ("admin_h.html",  pending=pending ,total=total,countvis=countvis, active=active,rejectobj=reject,
-                           months=months, accept_data=accept_data, total_data=total_data)  
-   
-
-
-
-
-
-
-
-@admin.route('/submit_date_range', methods=['POST'])
-def submit_date_range():
-    start_date = request.form.get('start_date')
-    end_date = request.form.get('end_date')
-
-    # start_dt = date.strptime(start_date, '%Y-%m-%d')
-    # end_dt = date.strptime(end_date, '%Y-%m-%d')
-    # end_dt = end_dt.replace(hour=23, minute=59, second=59)
-
-    print(f"[INFO] Date range submitted: {start_date} to {end_date}")
-
-    results = list(visitors_status.find({
-        "Date": {
-            "$gte": start_date,
-            "$lte": end_date 
-        }
-        
-    }))
+                           months=months, accept_data=accept_data, total_data=total_data ,visitobj =visitobj)  
     
-    # for r in results:
-    #     r["_id"] = str(r["_id"])
-    #     r["timestamp"] = r["timestamp"].strftime("%d-%b-%Y %H:%M")
-    
-    return render_template("visitor.html",  visitobj=results)
+
+
+
+
+
+
+

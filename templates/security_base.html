@@ -28,7 +28,7 @@
               
                 <div class="dropdown">
                     <button class="" type="button" id="menuButton" data-bs-toggle="dropdown" aria-expanded="false"style="background-color: rgba(0, 0, 0, 0.1);;">
-                  <a href="{{url_for('auth.profile')}}"><img src="static/images/{{ session['profile_image'] }}" width="50px" height="50px" class="rounded-circle " alt="Avatar"></a>
+                  <a href="{{url_for('auth.profile')}}"><img src="static/images/{{ session['profile_image'] }}" width="50px" height="50px" class="rounded-circle " alt="{{split}}"></a>
     </button>
                     <!-- Dropdown Menu -->
                     <ul class="dropdown-menu dropdown-menu-end text-center p-3 " aria-labelledby="menuButton" style="min-width: 280px; min-height: 300px;">
@@ -64,7 +64,7 @@
             <!-- Sidebar -->
 
             <nav class="col-md-2 col-sm-3 sidebar nav flex-column nav-pills" id="sidebar-tab" role="tablist">
-                <a class="nav-link {% if request.path == url_for('security.home') %}active{% endif %}" href="{{ url_for('security.home') }}">Dashboard</a>
+                <a class="nav-link {% if request.path == url_for('security.home') %}active{% endif %}" href="{{ url_for('security.security_home') }}">Dashboard</a>
                 <a class="nav-link {% if request.path == url_for('otp_gen.send_sms') %}active{% endif %}" href="{{ url_for('otp_gen.send_sms') }}">Visitor Pass</a>
                 <a class="nav-link {% if request.path == url_for('security.visitor') %}active{% endif %}" href="{{ url_for('security.visitor') }}">Visitors</a>
                 <a class="nav-link {% if request.path == url_for('routes.logoutsecurity') %}active{% endif %}" href="{{ url_for('routes.logoutsecurity') }}">Logout</a>
