@@ -1,10 +1,11 @@
-from flask import Blueprint, render_template, request, Response
+from flask import Blueprint, render_template, request, Response,redirect,url_for
 import cv2
 import datetime
 import os
 import time
 from bson.binary import Binary
 from bson import Binary
+import bson
 
 from app.camera_manager import get_camera,release_camera
 from app.ocr import extract_card_details
@@ -88,7 +89,7 @@ def gen_frame_image():
         success, frame = camera.read()
         if not success:
             break
-
+        
 
         elapsed_time = time.time() - start_time
 
@@ -106,26 +107,19 @@ def gen_frame_image():
             if existing_record:
                 # Update existing document with new image and timestamp
                 visitors_status.update_one(
-                    {"uid": current_uid},
-                    {
-                        "$set": {
-                            "filename": filename,
-                            "image": bson.Binary(image_data),
-                            "timestamp": now
+                        {"uid": current_uid},
+                        {
+                            "$set": {
+                                'image': {
+                                    'image_name': filename,
+                                    'thumbnail': bson.Binary(image_data)
+                                }
+                            }
                         }
-                    }
-                )
-                print(f"[INFO] Updated existing record for UID {current_uid}.")
-            else:
-                # Insert new record if UID not found
-                visitors_status.insert_one({
-                    "uid": current_uid,
-                    "filename": filename,
-                    "image": bson.Binary(image_data),
-                    "timestamp": now,
-                })
-                print(f"[INFO] Inserted new record for UID {current_uid}.")
+                    )
 
+                print(f"[INFO] Updated existing record for UID {current_uid}.")
+       
             captured_image = filename
             release_camera()
             break
@@ -139,10 +133,20 @@ def gen_frame_image():
 
 
 
-@image_processing.route('/capture_image', methods=['POST'])
+@image_processing.route('/capture_image', methods=['POST','GET'])
 def capture_image():
     uid = request.form.get('uid')  # Get UID from form
     global current_uid
     current_uid = uid
     print(f"[INFO] Capture request received for UID: {uid}")
     return Response(gen_frame_image(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+
+@image_processing.route('/capture',methods=['GET','POST'])
+def capture():
+   return render_template("test.html")
+@image_processing.route('/after_capture',methods=['GET','POST'])
+def after_capture():
+   
+   return redirect(url_for('security.securitydash'))

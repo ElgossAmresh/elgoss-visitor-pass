@@ -3,7 +3,7 @@ import cv2
 camera = None
 
 def get_camera():
-    print(f"camera open")
+
     global camera
     try:
         if camera is None or not camera.isOpened():

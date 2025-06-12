@@ -1,8 +1,8 @@
-from flask import Blueprint, redirect, url_for, request, render_template
+from flask import Blueprint, redirect, url_for, request, render_template,session
 from models.database import reqvistable, visitorlogtable, activevisitorstable, rejectedvistable,otp_send, visitors_status
 from app.camera_manager import release_camera
-import datetime,os
-
+import datetime,os,io
+from flask import send_file
 visitor = Blueprint('visitors', __name__)
 
 
@@ -35,7 +35,11 @@ def visitor1():
                 "phone": phone,
                 "Approvedby": apprv,
                 "Exittime": "",
-                "status":""
+                "status":"",
+                'image': {
+                   'image_name':None,
+                   'thumbnail':'test'
+               } 
             }
             
             reqvistable.insert_one(dataobject1)
@@ -74,7 +78,7 @@ def acceptvis(uid):
     visitors_status.update_one(myquery, {"$set": {"status": status}})
 
 
-    return redirect(url_for('admin.admindash'))
+    return redirect(url_for('admin.admin_h'))
 
 
 @visitor.route('/rejectvis/<uid>', methods=['POST','GET'])
@@ -85,7 +89,13 @@ def rejectvis(uid):
     
     visitors_status.update_one({"UID": uid}, {"$set": {"status": "rejected"}})
     
-    return redirect(url_for('admin.admindash'))
+    return redirect(url_for('admin.admin_h'))
 
 
-
+@visitor.route('/visitor_image')
+def visitor_image():
+    uid = request.form.get('uid') 
+    user = visitors_status.find_one({'uid': uid})
+    if user and 'image' in user:
+        image_data = user['image_name']['thumbnail']
+        return send_file(io.BytesIO(image_data), mimetype='image/jpeg')

@@ -116,6 +116,7 @@ def pan_read_data(text):
         "Father_Name": father_match.group(1) if father_match else None,
         "dob": dob_match.group(1) if dob_match else None,
         "sex": gender_match.group(0) if gender_match else None
+        
     }
     return data
 

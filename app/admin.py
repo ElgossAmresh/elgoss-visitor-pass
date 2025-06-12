@@ -87,7 +87,7 @@ def add_admin():
             time=current_time
 
             hashed_password = generate_password_hash(Password)
-            # hashed_password = bcrypt.generate_password_hash(Password).decode('utf-8')
+        
             new_admin = {
                 "Name":Name,
                 "Email":Email,
@@ -97,7 +97,7 @@ def add_admin():
                 "Job":Job,
                 "Password":hashed_password ,                  
                'profile_image': {
-                   'image_name':'dummy.png',
+                   'image_name':None,
                    'thumbnail':'test'
                } 
         }
@@ -105,39 +105,18 @@ def add_admin():
             
             collection.insert_one(new_admin)
             adminlog.insert_one(new_admin)
-        return redirect(url_for('admin.admindash'))
+        return redirect(url_for('admin.admin_h'))
+
+     
 @admin.route('/deleteuser/<string:Phone>', methods=['POST', 'GET'])
 def deleteuser(Phone):
     collection.delete_one({"Phone": Phone})
     securitylog.delete_one({"Phone": Phone})
     adminlog.delete_one({"Phone": Phone})
-    return redirect(url_for('admin.admindash'))
+    return render_template('user_overview.html')
 
 
-# @admin.route('/updateusers/<id>', methods=['POST', 'GET'])
-# def updateusers(id):
-#     users = collection.db.users
-#     items = users.find_one({'_id': ObjectId(id)})
 
-#     if request.method == 'POST':
-#         if request.form['submit'] == 'pass':
-#             myquery = {'_id': ObjectId(id)}
-
-#             updatelog = {"$set":
-#                              {"Name": request.form.get('Name'),
-#                               "Email": request.form.get('Email'),
-#                               "Phone": request.form.get('Phone'),
-#                               "Job": request.form.get('Job'),
-#                               "Password": request.files.get('Password'),
-#                               "date": datetime.datetime.utcnow()
-#                               }
-#                          }
-
-#     adminlog.update_one(myquery, updatelog)
-#     collection.update_one(myquery, updatelog)
-#     securitylog.update_one(myquery, updatelog)
-
-    # return redirect(url_for('admin.admindash'))
 
 @admin.route('/edituser/<string:Phone>', methods=['GET','POST'])
 def edituser():
@@ -198,7 +177,7 @@ def admin_h():
         except ValueError:
             print("Invalid date format received")
     
-    print(f"Final MongoDB query: {query}")  # Debugging
+  
 
     # Query the filtered results
     visitobj = list(visitors_status.find(query).sort("date", -1))
@@ -206,9 +185,10 @@ def admin_h():
     # For total stats (not filtered)
     all_visitors = list(visitors_status.find({}))
 
-    reject = sum(1 for v in all_visitors if v["status"] == "rejected")
-    active = sum(1 for v in all_visitors if v["status"] == "accepted")
-    pending = sum(1 for v in all_visitors if v["status"] == "")
+    reject = sum(1 for v in all_visitors if v.get("status") == "rejected")
+    active = sum(1 for v in all_visitors if v.get("status") == "accepted")
+    pending = sum(1 for v in all_visitors if v.get("status") == "")
+
     total = len(all_visitors)
 
     monthly_stats = defaultdict(lambda: {"accept": 0, "total": 0})

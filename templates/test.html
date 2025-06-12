@@ -1,12 +1,101 @@
-<div class="dropdown">
-                    <button class="btn p-0 border-0 bg-transparent d-flex align-items-center" type="button" id="menuButton" data-bs-toggle="dropdown" aria-expanded="false">
-    
-    <!-- Profile Circle with Initials -->
-    <div class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center me-2" 
-         style="width: 40px; height: 40px; font-weight: bold;">
-      {{ initials }}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Camera Feed</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        
+        h1 {
+            color: #333;
+        }
+        
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .video-container,
+        .image-container {
+            margin: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        img {
+            border: 5px solid #333;
+            border-radius: 10px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            margin: 10px;
+            font-size: 18px;
+            text-decoration: none;
+            color: white;
+            background-color: #007bff;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            text-align: left;
+        }
+        
+        .btn-danger:hover {
+            background-color: #a71d2a;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Live Camera Feed</h1>
+
+    <div class="container">
+        <div class="video-container">
+            
+            <img src="{{url_for('image_processing.capture_image')}}" width="480" height="400">
+        </div>
+        
     </div>
 
-    <!-- Optional: show full name next to it -->
-    <span class="ms-1">{{ user_name }}</span>
-  </button>
+    <br>
+   
+
+    <script>
+        function captureImage() {
+            fetch('/capture_image')
+                .then(response => response.text())
+                .then(filename => {
+                    document.getElementById("capturedImage").src = "/static/" + filename + "?t=" + new Date().getTime();
+                    document.getElementById("capturedImage").style.display = "block";
+                })
+                .catch(error => console.error("Error capturing image:", error));
+        }
+    </script>
+    <script>
+// After 11 seconds (10s capture + 1s buffer), redirect to show captured page
+setTimeout(function() {
+    window.location.href = "{{ url_for('image_processing.after_capture') }}";
+}, 11000);
+</script>
+
+</body>
+
+</html>

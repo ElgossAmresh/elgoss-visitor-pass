@@ -13,7 +13,7 @@ rejectobj = list(rejectedvistable.find())
 secobj = list(securitylog.find())
 
 
-reject=len(rejectobj)
+reject=len(rejectobj) 
 countvis = len(visitobj)
 active = len(activeobj)
 # total=countvis+reject
@@ -143,9 +143,10 @@ def security_home():
     # For total stats (not filtered)
     all_visitors = list(visitors_status.find({}))
 
-    reject = sum(1 for v in all_visitors if v["status"] == "rejected")
-    active = sum(1 for v in all_visitors if v["status"] == "accepted")
-    pending = sum(1 for v in all_visitors if v["status"] == "")
+    reject = sum(1 for v in all_visitors if v.get("status") == "rejected")
+    active = sum(1 for v in all_visitors if v.get("status") == "accepted")
+    pending = sum(1 for v in all_visitors if v.get("status") == "")
+
     total = len(all_visitors)
    
  

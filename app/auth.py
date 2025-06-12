@@ -7,7 +7,6 @@ from bson import Binary
 from PIL import Image
 from flask import send_file, make_response
 import io
-import base64
 from flask_bcrypt import Bcrypt
 # from bson import ObjectId  
 from flask_login import UserMixin, login_user, login_required, logout_user, current_user
@@ -63,8 +62,9 @@ def login():
             session['user_id'] = user.email   
             session['username'] = user.username 
             session['profile_image'] = user.profile_image  
-            session['Job']=user.Job         
-            print(f"user data profile_image:{profile_image}")
+            session['Job']=user.Job 
+            session['username_short'] =user.username[0].upper()   
+           
 
             session['logged_in'] = True
             login_user(user)
@@ -118,12 +118,12 @@ def view_profile():
         user_data = collection.find_one({'Email': email})
         if user_data:
             user_data['_id'] = str(user_data['_id'])  
-            return render_template('profile_security.html', user_data=user_data)
+            return render_template('view_profile.html', data=user_data)
         else:
             return render_template('error.html', message="User not found.")
     else:
         
-      return render_template('auth.view_profile')
+      return render_template('view_profile.html')
 
 @auth.route('/update_profile', methods=['POST','GET'])
 def update_profile():
@@ -136,37 +136,50 @@ def update_profile():
    
 
 
-@auth.route('/update_profile_all', methods=['POST','GET'])
+@auth.route('/update_profile_all', methods=['POST'])
 def update_profile_all():
-    
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
+
     if request.method == 'POST':
-            email = session['user_id']
-                  
-    updated_data = { 
-        'Name': request.form.get('firstName'),
-        'lastName': request.form.get('lastName'),
-        'Phone': request.form.get('Phone'),
-        'Address': request.form.get('Address'),
-        'City': request.form.get('City'),
-        'State': request.form.get('State'),
-        'Zip': request.form.get('Zip'),
-        'Email': request.form.get('Email'),
+        email = session.get('user_id')
 
-        'Country': request.form.get('Country')
-        
-    }
-    result = collection.update_one({'Email': email}, {'$set': updated_data})
+        updated_data = { 
+            'Name': request.form.get('firstName'),
+            'lastName': request.form.get('lastName'),
+           
+            'Phone': request.form.get('Phone'),
+            'Address': request.form.get('Address'),
+            'City': request.form.get('City'),
+            'State': request.form.get('State'),
+            'PIN': request.form.get('PIN'),
+            'Date': request.form.get('Date'),
+            'Email': request.form.get('Email'),
+            'Country': request.form.get('Country'),
+            'Skill': request.form.get('Skill'),
+            'Gender': request.form.get('Gender'),
+            'Company': request.form.get('Company')
 
-    flash("Profile updated successfully!" if result.modified_count else "No changes made.")
-    return redirect(url_for('auth.profile'))
+        }
+        if email:
+            
+            collection.update_one({'Email': email}, {'$set': updated_data})
+
+        return redirect(url_for('auth.view_profile'))
+
+    
+    return redirect(url_for('auth.view_profile'))
+
 
 
 @ auth.route('/cancle', methods=['POST', 'GET'])
 def cancle():
-                 
-    return  render_template('security_home.html')
+    role=session['Job']
+    job=role.lower()
+    if job =='admin':
+        return redirect(url_for('auth.view_profile'))
+    else:
+       return  redirect(url_for('auth.view_profile'))
 
 @auth.route('/upload_profile_image', methods=['POST'])
 def upload_profile_image():
@@ -183,7 +196,7 @@ def upload_profile_image():
         if not file or not file.filename.endswith(('.jpg', '.jpeg', '.png')):
                 return render_template('update_profile.html', message="Invalid file type. Use JPG or PNG.")
 
-            # Open image with Pillow
+            
         image = Image.open(file)
 
         image.thumbnail(THUMBNAIL_SIZE)
@@ -192,29 +205,24 @@ def upload_profile_image():
         thumb_io = io.BytesIO()
         image.save(thumb_io, format=image.format or 'JPEG')
         thumb_data = thumb_io.getvalue()
-        # image_doc = {
-        #     'image_name': file.filename,  # Store original image name
-        #     'thumbnail': thumb_data  # Store thumbnail as binary
-        # }
        
-
         image_doc = {
             'image_name': file.filename,
             'thumbnail': Binary(thumb_data)
         }
+        session['profile_image'] = {
+            'image_name': file.filename,
+            'thumbnail':  Binary(thumb_data) 
+        }
         email = session['user_id']
+       
         collection.update_one({'Email': email}, {'$set': {'profile_image': image_doc}})
 
     return redirect(url_for('auth.update_profile')) 
 
 
 
-
-
-from flask import send_file, session
-import io
-
-@auth.route('/profile/image')
+@auth.route('profile_image')
 def profile_image():
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
