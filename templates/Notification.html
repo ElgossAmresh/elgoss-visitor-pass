@@ -1,71 +1,138 @@
-
 {% extends 'admin_base.html' %}
 
 {% block title %}Notification{% endblock title %}
- <link href="../static/visitor.css" rel="stylesheet" />
+<link href="../static/visitor.css" rel="stylesheet" />
 
-
-{% block body %}  
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">  
+{% block body %}
+<!-- CSS Imports -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
+
+<!-- JS Imports -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
-        <div class="table-responsive">
-            <table id="example" class="table table-striped table-bordered nowrap" style="width:100%">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Sr No</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone No</th>
-                        <th>Card</th>
-                        <th>UID No</th>
-                        <th>Gender</th>
-                        <th>Purpose</th>
-                        <th>Approved</th>
-                        <th>Entry Details</th>
-                        <th>Decision</th>
-                    </tr>
-                </thead>
-                      {% for rvis in reqobj%}
-                      <tbody><tr>
-                        <td>{{ loop.index }}</td>
-                        <td>{{ rvis['Name'] }}</td>
-                        <td>{{ rvis['Email'] }}</td>
-                        <td>{{ rvis['Phone'] }}</td>
-                        <td>{{ rvis['Card'] }}</td>
-                        <td>{{ rvis['UID'] }}</td>
-                        <td>{{ rvis['Gender'] }}</td>
-                        <td>{{ rvis['Purpose'] }}</td>
-                        <td>{{ rvis['Approvedby'] }}</td>
-                        <td>{{ rvis['Date'] }}</td>
-                        <td>
-                         
-                                <a href="{{ url_for('visitors.acceptvis', uid=rvis['UID']) }}">
-                                    <button type="submit" class="btn btn-success">
-                               
-                              Accept
-                            </button></a>
-                           
-                            <form action="{{ url_for('visitors.rejectvis', uid=rvis['UID']) }}" method="POST">
-                                <button type="submit" class="btn btn-danger">Reject</button>
-                              </form>
-                          
-                              
-                              
-                        </td>
-                    </tr>
-                      </tbody>
-                      {% endfor %}
-                    </table>
-          </div>
-        <script>
-            $(document).ready(function() {
-                $('#example ,#example1,#example2').DataTable({
-                    responsive: true
-                });
-            });
-        </script>
+<!-- 🔍 Date Range Picker (RIGHT ALIGNED) -->
+<div class="container mt-4 mb-3 d-flex justify-content-between align-items-center">
+    <h3 class="mb-0">Visitor Requests</h3>
+    <div>
+        <div id="reportrange" class="btn btn-outline-primary d-flex align-items-center">
+            <i class="bi bi-calendar-event me-2"></i>
+            <span>Select Date Range</span>
+            <i class="bi bi-caret-down-fill ms-2"></i>
+        </div>
+        <input type="hidden" id="start_date">
+        <input type="hidden" id="end_date">
+    </div>
+</div>
+
+<!-- Table -->
+<div class="table-responsive">
+    <table id="example" class="table table-striped table-bordered nowrap" style="width:100%">
+        <thead class="table-dark">
+            <tr>
+                <th>Sr No</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone No</th>
+                <th>Card</th>
+                <th>UID No</th>
+                <th>Gender</th>
+                <th>Purpose</th>
+                <th>Approved</th>
+                <th>Entry Details</th>
+                <th>Decision</th>
+            </tr>
+        </thead>
+        <tbody id="notification-body">
+            {% for rvis in reqobj %}
+            <tr>
+                
+                <td>{{ rvis['Name'] }}</td>
+                <td>{{ rvis['Email'] }}</td>
+                <td>{{ rvis['Phone'] }}</td>
+                <td>{{ rvis['Card'] }}</td>
+                <td>{{ rvis['UID'] }}</td>
+                <td>{{ rvis['Gender'] }}</td>
+                <td>{{ rvis['Purpose'] }}</td>
+                <td>{{ rvis['Approvedby'] }}</td>
+                <td>{{ rvis['Date'] }}</td>
+                <td>
+                    <a href="{{ url_for('visitors.acceptvis', uid=rvis['UID']) }}">
+                        <button type="submit" class="btn btn-success">Accept</button>
+                    </a>
+                    <form action="{{ url_for('visitors.rejectvis', uid=rvis['UID']) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Reject</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- JavaScript -->
+<script>
+$(document).ready(function() {
+    // Initialize DataTable
+    var table = $('#example').DataTable({ responsive: true });
+
+    var start = moment().subtract(6, 'days');
+    var end = moment();
+
+    // Callback to handle the AJAX update after date selection
+    function cb(start, end) {
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        $('#start_date').val(start.format('YYYY-MM-DD'));
+        $('#end_date').val(end.format('YYYY-MM-DD'));
+
+        // Prevent full page reload
+        event.preventDefault();
+
+        // 🔄 AJAX call to fetch filtered data
+        $.ajax({
+            url: '/notification',  // Flask route to be created
+            method: 'GET',
+            data: {
+                start_date: start.format('YYYY-MM-DD'),
+                end_date: end.format('YYYY-MM-DD')
+            },
+            success: function(response) {
+                $('#notification-body').html(response);
+                table.clear().destroy(); // Destroy old instance
+                $('#example').DataTable({ responsive: true }); // Re-initialize
+            },
+            error: function() {
+                alert('Failed to load filtered data.');
+            }
+        });
+    }
+
+    // Initialize the DateRangePicker
+    $('#reportrange').daterangepicker({
+        startDate: start,
+        endDate: end,
+        ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, function(start, end, label) {
+        // Avoid page reload explicitly
+        cb(start, end);
+    });
+
+    // Initial load
+    cb(start, end);
+});
+</script>
+
+
 {% endblock body %}

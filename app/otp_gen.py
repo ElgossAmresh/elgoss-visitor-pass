@@ -61,7 +61,8 @@ def reset():
             otp_send.insert_one(data)
            
             subject = "Your OTP"
-            body = f"Your OTP is: {otp}"
+            body = "http://127.0.0.1:5000/otp_match"
+
 
             # Send the email
             try:

@@ -10,6 +10,7 @@ from app.visitors import visitor
 from app.admin import admin
 from app.security import security
 from app.otp_gen import otp_gen
+from app.intern import intern
 from app.image_processing import image_processing
 from app.extensions import bcrypt,login_manager
 
@@ -36,5 +37,6 @@ def create_app():
     app.register_blueprint(admin)
     app.register_blueprint(security)
     app.register_blueprint(ocr)
+    app.register_blueprint(intern)
 
     return app

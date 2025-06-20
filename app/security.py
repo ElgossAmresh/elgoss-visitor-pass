@@ -25,29 +25,29 @@ security = Blueprint('security', __name__)
 
 @security.route('/addsec', methods=['POST','GET'])
 
-def add_security():
-   if request.method == 'POST':
-        if request.form['submit'] == 'pass':
-            name1 = request.form['fullname']
-            email1 = request.form['addemail']
-            phone = request.form['phone']
-            job = request.form['jobtitle']
-            password = request.form['password']
-            hashed_password = generate_password_hash(password)
-            daobject = {
-                "Name": name1,
-                "Email": email1,
-                "Phone": phone,
-                "Job": job,
-                "Password": hashed_password, 
-            }
+# def add_security():
+#    if request.method == 'POST':
+#         if request.form['submit'] == 'pass':
+#             name1 = request.form['fullname']
+#             email1 = request.form['addemail']
+#             phone = request.form['phone']
+#             job = request.form['jobtitle']
+#             password = request.form['password']
+#             hashed_password = generate_password_hash(password)
+#             daobject = {
+#                 "Name": name1,
+#                 "Email": email1,
+#                 "Phone": phone,
+#                 "Job": job,
+#                 "Password": hashed_password, 
+#             }
 
           
 
-        collection.insert_one(daobject)
-        securitylog.insert_one(daobject)
+#         collection.insert_one(daobject)
+#         securitylog.insert_one(daobject)
  
-        return redirect(url_for('routes.login'))  # Redirect to the login page
+#         return redirect(url_for('routes.login'))  # Redirect to the login page
 
 
 @security.route('/securitydash',methods=['GET','POST'])
@@ -78,34 +78,19 @@ def securitydash():
 
 @security.route("/visitor", methods=["GET"])
 def visitor():   
-    
-    # start_date_str = request.args.get('start_date')
-    # end_date_str = request.args.get('end_date')
-    # print(f"startdate+++{start_date_str},end date---------{end_date_str}")
-    # query = {}
-    # visitobj = []
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    print(f"start date ============================== {start_date}, end date: {end_date}")
+    filtered_visitors = visitors_status.find({
+        "Date": {
+            "$gte": start_date,
+            "$lte": end_date
+        }
+    })
+    print(f"Filtered visitors : {filtered_visitors}")
 
-    # if start_date_str and end_date_str:
-    #     try:
-    #         # Parse dates from string to datetime
-    #         start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
-    #         end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
-    #         end_date = end_date.replace(hour=23, minute=59, second=59)  # include full end day            
-    #         query = {
-    #             'Date': {
-    #                 '$gte': start_date,
-    #                 '$lte': end_date
-    #             }
-    #         }
-    #         print(f"quer++===================={query}")
-    #         visitobj = list(visitors_status.find(query))
-    #         print(f"store data in db {visitobj}")
-    #     except ValueError:            
-    #         visitobj = []
-
-    # else:        
-        visitobj = list(visitors_status.find())
-        return render_template("visitor.html",visitobj=visitobj,rvis=visitobj)
+    return render_template("visitor.html",  visitobj=filtered_visitors)
+     
     
 
 
@@ -155,8 +140,29 @@ def security_home():
 @security.route('/home', methods=['POST', 'GET'])
 def home():
     return render_template("security_home.html",countvis=countvis)
+
 @security.route("/overview", methods=["GET"])
 def overview():
     visitobj = list(visitorlogtable.find({"exit_time": None}))
   
     return render_template("overview.html",visitobj=visitobj)
+
+
+@security.route("/filter_by_date",methods=["GET"])
+def filter_by_date():
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    print(f"start date ============================== {start_date}, end date: {end_date}")
+    filtered_visitors = visitors_status.find({
+        "Date": {
+            "$gte": start_date,
+            "$lte": end_date
+        }
+    })
+    print(f"Filtered visitors : {filtered_visitors}")
+
+    return render_template("visitor.html",  visitobj=filtered_visitors)
+@security.route("/attendance_camera", methods=["GET"])
+def attendance_camera():
+
+    return render_template("attendance_camera.html")

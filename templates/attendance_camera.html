@@ -1,0 +1,25 @@
+{% extends 'security_base.html' %}
+{% block title %}Live Face Match{% endblock %}
+{% block body %}
+
+<div class="camera-container" style="text-align: center; margin-top: 30px;">
+    <h1>Face Recognition Attendance</h1>
+    <img id="videoFeed" src="{{ url_for('intern.video_feed_intern') }}" style="border: 4px solid #333; border-radius: 10px; width: 640px; height: 480px;" />
+
+    <div style="margin-top: 20px;">
+        <!-- <button onclick="matchFace()" style="padding: 10px 20px; background-color: green; color: white;">Start Match</button> -->
+        <button onclick="stopCamera()" style="padding: 10px 20px; background-color: red; color: white;">Stop Camera</button>
+    </div>
+
+    <div id="resultText" style="margin-top: 20px; font-size: 18px;">📷 Waiting...</div>
+</div>
+
+<script>
+   
+
+    function stopCamera() {
+        document.getElementById("videoFeed").src = "{{ url_for('intern.release_camera') }}";
+        document.getElementById("resultText").innerText = "🛑 Camera stopped.";
+    }
+</script>
+{% endblock %}

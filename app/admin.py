@@ -1,11 +1,15 @@
 from flask import Blueprint, request, redirect, url_for,render_template,flash,request,session
 from werkzeug.security import generate_password_hash
-from models.database import collection, adminlog, securitylog,visitorlogtable,activevisitorstable,reqvistable,rejectedvistable,visitors_status
+from models.database import collection, adminlog, intern_db,securitylog,visitorlogtable,activevisitorstable,reqvistable,rejectedvistable,visitors_status
 from datetime import date,datetime
 from flask_bcrypt import Bcrypt
 from bson import ObjectId
 from collections import defaultdict
 from flask import json
+import smtplib
+from config.setting import SMTP_PORT,SMTP_SERVER,SENDER_EMAIL,SENDER_PASSWORD
+
+from email.mime.text import MIMEText
 
 admin = Blueprint('admin', __name__)
 bcrypt = Bcrypt()
@@ -87,7 +91,7 @@ def add_admin():
             time=current_time
 
             hashed_password = generate_password_hash(Password)
-        
+            update_pass(Email)
             new_admin = {
                 "Name":Name,
                 "Email":Email,
@@ -102,10 +106,12 @@ def add_admin():
                } 
         }
 
-            
+            update_pass(Email)
+            if Job =="Intern":
+                intern_db.insert_one(new_admin)
             collection.insert_one(new_admin)
             adminlog.insert_one(new_admin)
-        return redirect(url_for('admin.admin_h'))
+        return redirect(url_for('admin.filter_role'))
 
      
 @admin.route('/deleteuser/<string:Phone>', methods=['POST', 'GET'])
@@ -113,7 +119,8 @@ def deleteuser(Phone):
     collection.delete_one({"Phone": Phone})
     securitylog.delete_one({"Phone": Phone})
     adminlog.delete_one({"Phone": Phone})
-    return render_template('user_overview.html')
+    # return render_template('user_overview.html')
+    return redirect(url_for('admin.filter_role'))
 
 
 
@@ -127,9 +134,19 @@ def edituser():
 
 @admin.route("/notification",methods=['POst','GET'])
 def notification():
-    reqobj = list(reqvistable.find())
-    return render_template ('Notification.html',reqobj=reqobj) 
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+   
+    filtered = reqvistable.find({
+        "Date": {
+            "$gte": start_date,
+            "$lte": end_date
+        }
+    })
 
+    return render_template('Notification.html',reqobj=filtered)
+
+ 
 
 @admin.route("/filter_role", methods=['GET'])  # dropdown filtering
 def filter_role():
@@ -140,15 +157,27 @@ def filter_role():
     users = list(collection.find(query))  
     return render_template('user_overview.html', users=users, selected_role=status)
 
-
-@admin.route("/visitor_over",methods=['POst','GET'])
+@admin.route("/visitor_over", methods=['GET', 'POST'])
 def visitor_over():
-
     status = request.args.get('status', 'all')
-    query = {} if status == 'all' else {"status": status}
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
 
-    users = list(visitors_status.find(query))  
-    return render_template('visitor_overview.html', users=users, status_filter=status) 
+    query = {}
+
+    # Filter by status if not 'all'
+    if status != 'all':
+        query['status'] = status
+
+    # Filter by date range if provided
+    if start_date and end_date:
+        query['Date'] = {
+            "$gte": start_date,
+            "$lte": end_date
+        }
+    users = list(visitors_status.find(query))
+    return render_template('visitor_overview.html', users=users, status_filter=status)
+
 
 
 @admin.route("/admin_h",methods=['POst','GET'])
@@ -156,7 +185,7 @@ def admin_h():
     filter_type = request.args.get("filter", "all")
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
-    print(f"start date ============================== {start_date}")
+   
     query = {}
 
     # Apply status filter
@@ -217,8 +246,46 @@ def admin_h():
                            months=months, accept_data=accept_data, total_data=total_data ,visitobj =visitobj)  
     
 
+@admin.route("/attendance",methods=['POST','GET'])
+def attendance():
+    return render_template("attendance_table.html")
 
 
+
+def update_pass(email):
+
+    sender_email = SENDER_EMAIL
+    sender_password = SENDER_PASSWORD
+
+    smtp_server = SMTP_SERVER
+    smtp_port = SMTP_PORT
+    recipient_email = email
+
+
+    subject = "reset Password"
+    body = "http://127.0.0.1:5000/update_password"
+
+    # Send the email
+    try:
+        msg = MIMEText(body)
+        msg['Subject'] = subject
+        msg['From'] = sender_email
+        msg['To'] = recipient_email
+
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()  # Enable TLS encryption
+            server.login(sender_email, sender_password)
+            server.send_message(msg)
+            session['reset_email'] = email # start the session of exist email in your db
+        # print(f"OTP '{otp}' sent to {recipient_email}")
+    except Exception as e:
+        print(f"Error sending email: {e}")
+
+
+@admin.route("/update_password",methods=['POST','GET'])
+def update_password():
+
+    return render_template("update_pass.html")
 
 
 

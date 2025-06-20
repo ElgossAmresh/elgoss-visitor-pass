@@ -86,6 +86,7 @@
                 <a class="nav-link {% if request.path == url_for('security.home') %}active{% endif %}" href="{{ url_for('security.security_home') }}">Dashboard</a>
                 <a class="nav-link {% if request.path == url_for('otp_gen.send_sms') %}active{% endif %}" href="{{ url_for('otp_gen.send_sms') }}">Visitor Pass</a>
                 <a class="nav-link {% if request.path == url_for('security.visitor') %}active{% endif %}" href="{{ url_for('security.visitor') }}">Visitors</a>
+                <a class="nav-link {% if request.path == url_for('security.attendance_camera') %}active{% endif %}" href="{{ url_for('security.attendance_camera') }}">Attendance</a>
                 <a class="nav-link {% if request.path == url_for('routes.logoutsecurity') %}active{% endif %}" href="{{ url_for('routes.logoutsecurity') }}">Logout</a>
 
             </nav>

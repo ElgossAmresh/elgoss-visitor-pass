@@ -85,6 +85,7 @@
                 <a class="nav-link {% if request.path == url_for('admin.filter_role') %}active{% endif %}" href="{{ url_for('admin.filter_role') }}">User </a>
                 <a class="nav-link {% if request.path == url_for('admin.visitor_over') %}active{% endif %}" href="{{ url_for('admin.visitor_over') }}">Visitor </a>
                 <a class="nav-link {% if request.path == url_for('admin.notification') %}active{% endif %}" href="{{ url_for('admin.notification') }}">Notification</a>
+                   <a class="nav-link {% if request.path == url_for('intern.merged_attendance') %}active{% endif %}" href="{{ url_for('intern.merged_attendance') }}">Attendance</a>
                 <a class="nav-link {% if request.path == url_for('routes.logout') %}active{% endif %}" href="{{ url_for('routes.logout') }}">Logout</a>
             </nav>
 

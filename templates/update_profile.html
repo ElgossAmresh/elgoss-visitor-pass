@@ -120,13 +120,13 @@
                             </div>
                             <div class="col-md-6">
                                 <input type="email" class="form-control mb-3" placeholder="Email id." name="Email" value="{{ data['Email'] }}">
-                                <input type="date" class="form-control mb-3" name="Date" value="{{ data['data'] }}">
+                                <input type="date" class="form-control mb-3" name="DOB" value="{{ data['DOB'] }}">
                             </div>
                             <div class="col-md-6">
                                 <input type="text" class="form-control mb-3" placeholder="Mobile No." name="Mobile" value="{{ data['Mobile'] }}">
                             </div>
                             <div class="col-md-6">
-                                <select class="form-control mb-3" name="Gender">
+                                <select class="form-control mb-3" name="Gender" value="{{ data['Gender'] }}">
                             <option disabled selected>Gender</option>
                             <option>Male</option>
                             <option>Female</option>
@@ -154,11 +154,11 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <input type="text" class="form-control mb-3" placeholder="Address" name="Address">
+                                    <input type="text" class="form-control mb-3" placeholder="Address" name="Address" value="{{ data['Address'] }}">
                                     <input type="text" class="form-control mb-3" placeholder="PIN Code" name="PIN" value="{{ data['PIN'] }}">
                                 </div>
                                 <div class="col-md-6">
-                                    <select class="form-control mb-3" name="City">
+                                    <select class="form-control mb-3" name="City" value="{{ data['City'] }}">
                                 <option disabled selected>City</option>
                                 <option>Mumbai</option>
                                 <option>Delhi</option>
@@ -192,7 +192,7 @@
                                 <option>Chandigarh</option>
                             </select>
 
-                                    <select class="form-control mb-3" name="State">
+                                    <select class="form-control mb-3" name="State" value="{{ data['State'] }}">
                                 <option disabled selected>State</option>
                                 <option>Andhra Pradesh</option>
                                 <option>Arunachal Pradesh</option>

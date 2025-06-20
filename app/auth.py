@@ -41,7 +41,7 @@ def login():
         email = request.form['email']
         password = request.form['password']
         user_data = collection.find_one({"Email": email})
-        print(f"user data  {user_data}")
+       
         
         if not user_data:
             flash("Invalid email and Password", "danger")
@@ -63,7 +63,11 @@ def login():
             session['username'] = user.username 
             session['profile_image'] = user.profile_image  
             session['Job']=user.Job 
-            session['username_short'] =user.username[0].upper()   
+            if user.username and len(user.username) > 0:
+             session['username_short'] = user.username[0].upper()
+            else:
+             session['username_short'] = '?'  
+
            
 
             session['logged_in'] = True
@@ -71,8 +75,10 @@ def login():
             role = user_data.get("Job", "").lower()
             if role == "admin":
                 
-                
                 return redirect(url_for('admin.admin_h')) 
+            elif role == "intern":
+                
+                return redirect(url_for('security.security_home')) 
             elif role == "security":
                 
                 return redirect(url_for('security.security_home'))  
@@ -147,19 +153,40 @@ def update_profile_all():
         updated_data = { 
             'Name': request.form.get('firstName'),
             'lastName': request.form.get('lastName'),
-           
             'Phone': request.form.get('Phone'),
             'Address': request.form.get('Address'),
             'City': request.form.get('City'),
             'State': request.form.get('State'),
-            'PIN': request.form.get('PIN'),
-            'Date': request.form.get('Date'),
+            'PIN code': request.form.get('PIN code'),
+            'DOB': request.form.get('DOB'),
             'Email': request.form.get('Email'),
-            'Country': request.form.get('Country'),
             'Skill': request.form.get('Skill'),
             'Gender': request.form.get('Gender'),
-            'Company': request.form.get('Company')
-
+            'Company': request.form.get('Company'),
+            'class10_board':request.form.get('class10_board'),
+            'class10_year':request.form.get('class10_year'),
+            'class10_percentage':request.form.get('class10_percentage'),
+            'class10_schoolName':request.form.get('class10_schoolName'),
+            
+            'class12_board':request.form.get('class12_board'),
+            'class12_year':request.form.get('class12_year'),
+            'class12_percentage':request.form.get('class12_percentage'),
+            'class12_schoolName':request.form.get('class12_schoolName'),
+            
+            'grad_university':request.form.get('grad_university'),
+            'grad_year':request.form.get('grad_year'),
+            'grad_percentage':request.form.get('grad_percentage'),
+            'grad_collegename':request.form.get('grad_collegename'),
+            
+            'pg_university':request.form.get('pg_university'),
+            'pg_year':request.form.get('pg_year'),
+            'pg_percentage':request.form.get('pg_percentage'),
+            'pg_collegename':request.form.get('pg_collegename'),
+            
+            'skill1':request.form.get('skill1'),
+            'skill2':request.form.get('skill2'),
+            'skill3':request.form.get('skill3'),
+            'skill4':request.form.get('skill4')
         }
         if email:
             
@@ -208,16 +235,18 @@ def upload_profile_image():
        
         image_doc = {
             'image_name': file.filename,
+            'image_path': save_path,
             'thumbnail': Binary(thumb_data)
         }
         session['profile_image'] = {
             'image_name': file.filename,
-            'thumbnail':  Binary(thumb_data) 
+            'image_path': save_path,
+            'thumbnail': thumb_data
         }
         email = session['user_id']
        
         collection.update_one({'Email': email}, {'$set': {'profile_image': image_doc}})
-
+        
     return redirect(url_for('auth.update_profile')) 
 
 
